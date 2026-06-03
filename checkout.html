@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finalizar compra — Óticas Relux</title>
+  <meta name="description" content="Finalize sua compra na Óticas Relux com segurança." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="0.5" stop-color="#a7adb6"/><stop offset="1" stop-color="#6f757e"/></linearGradient>
+      <radialGradient id="iris" cx="0.38" cy="0.35" r="0.75"><stop offset="0" stop-color="#ffe066"/><stop offset="0.55" stop-color="#f5be00"/><stop offset="1" stop-color="#c8920a"/></radialGradient>
+    </defs>
+    <symbol id="eye" viewBox="0 0 120 70">
+      <path d="M6 34 C 30 8, 92 8, 116 30 C 92 18, 40 20, 14 38 Z" fill="url(#silver)"/>
+      <path d="M10 40 C 34 60, 92 60, 112 42 C 90 54, 40 56, 18 44 Z" fill="#f3f4f6"/>
+      <circle cx="68" cy="34" r="15.5" fill="url(#iris)"/><circle cx="71" cy="36" r="6.4" fill="#0a0a0a"/><circle cx="64.5" cy="29.5" r="2.6" fill="#fff" opacity="0.9"/>
+    </symbol>
+    <symbol id="g-sun" viewBox="0 0 200 80"><path d="M28 34h48a6 6 0 0 1 6 6v4a24 24 0 0 1-48 0v-4a6 6 0 0 1-6-6Z" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M124 34h48a6 6 0 0 1 6 6v4a24 24 0 0 1-48 0v-4a6 6 0 0 1-6-6Z" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M88 44c4-4 18-4 24 0M28 34l-12-6M178 34l12-6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="g-optic" viewBox="0 0 200 80"><rect x="26" y="28" width="56" height="34" rx="9" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><rect x="118" y="28" width="56" height="34" rx="9" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><path d="M82 40c6-4 12-4 18 0M26 34l-12-3M174 34l12-3" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="g-round" viewBox="0 0 200 80"><circle cx="56" cy="44" r="26" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><circle cx="144" cy="44" r="26" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><path d="M82 40c6-3 12-3 18 0M30 38l-14-4M170 38l14-4" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="g-sport" viewBox="0 0 200 80"><path d="M22 34c30-10 96-10 126 0 6 2 4 18-6 22-24 10-44 4-50-6-2-3-6-3-8 0-6 10-26 16-50 6-10-4-12-20-12-22Z" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></symbol>
+    <symbol id="g-lens" viewBox="0 0 200 80"><ellipse cx="100" cy="42" rx="48" ry="30" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><circle cx="100" cy="42" r="20" fill="none" stroke="currentColor" stroke-width="4"/><path d="M84 30a26 22 0 0 1 14-6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <!-- header -->
+  <header class="nav-wrap" id="navWrap">
+    <nav class="nav" aria-label="Navegação">
+      <a href="index.html" class="nav-brand" aria-label="Óticas Relux">
+        <svg class="brand-eye" viewBox="0 0 120 70" width="34" height="22" aria-hidden="true"><use href="#eye" /></svg>
+        <span class="brand-text"><b>ÓTICAS</b> RELUX</span>
+      </a>
+      <div class="nav-actions">
+        <span class="secure-badge"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg> Compra 100% segura</span>
+        <a class="btn btn-ghost" href="index.html">Continuar comprando</a>
+        <a class="icon-btn account-btn" id="accountBtn" href="conta.html" aria-label="Entrar ou criar conta">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <span class="acct-name" id="acctName"></span>
+        </a>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Alternar tema claro e escuro" title="Alternar tema">
+          <svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.2" /><g stroke-linecap="round"><line x1="12" y1="2.5" x2="12" y2="5" /><line x1="12" y1="19" x2="12" y2="21.5" /><line x1="2.5" y1="12" x2="5" y2="12" /><line x1="19" y1="12" x2="21.5" y2="12" /><line x1="5.2" y1="5.2" x2="6.9" y2="6.9" /><line x1="17.1" y1="17.1" x2="18.8" y2="18.8" /><line x1="18.8" y1="5.2" x2="17.1" y2="6.9" /><line x1="6.9" y1="17.1" x2="5.2" y2="18.8" /></g></svg>
+          <svg class="ico-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 7 7 0 1 0 20 14.5Z" /></svg>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <main class="checkout">
+    <div class="container checkout-grid">
+      <!-- FORM -->
+      <form class="co-form" id="checkoutForm" novalidate>
+        <a class="co-back" href="index.html#destaques">← Continuar comprando</a>
+        <h1 class="co-title">Finalizar compra</h1>
+
+        <!-- Identificação -->
+        <section class="co-card">
+          <h2><span class="co-step">1</span> Seus dados</h2>
+          <div class="co-row">
+            <div class="co-field full"><label for="nome">Nome completo *</label><input id="nome" name="nome" autocomplete="name" placeholder="Seu nome" /><span class="co-err">Informe seu nome.</span></div>
+            <div class="co-field"><label for="tel">Telefone / WhatsApp *</label><input id="tel" name="tel" inputmode="tel" autocomplete="tel" placeholder="(00) 00000-0000" /><span class="co-err">Informe um telefone válido.</span></div>
+            <div class="co-field"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" placeholder="voce@email.com" /><span class="co-err">E-mail inválido.</span></div>
+            <div class="co-field"><label for="cpf">CPF</label><input id="cpf" name="cpf" inputmode="numeric" placeholder="000.000.000-00" /><span class="co-err">CPF inválido.</span></div>
+          </div>
+        </section>
+
+        <!-- Entrega -->
+        <section class="co-card">
+          <h2><span class="co-step">2</span> Entrega</h2>
+          <div class="opt-list" id="deliveryOpts">
+            <label class="opt sel"><input type="radio" name="entrega" value="casa" checked />
+              <span class="o-ic"><svg viewBox="0 0 24 24"><path d="M3 7h13l5 5v5h-2M3 7v10h2M16 7v10M5 17a2 2 0 1 0 4 0 2 2 0 1 0-4 0Zm10 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0Z"/></svg></span>
+              <span class="o-main"><span class="o-title">Receber em casa</span><span class="o-sub">Envio para todo o Brasil com rastreio</span></span>
+              <span class="o-tag">Grátis</span>
+            </label>
+            <label class="opt"><input type="radio" name="entrega" value="loja" />
+              <span class="o-ic"><svg viewBox="0 0 24 24"><path d="M4 9h16l-1-4H5L4 9Zm0 0v11h16V9M9 20v-6h6v6"/></svg></span>
+              <span class="o-main"><span class="o-title">Retirar na loja</span><span class="o-sub">Rua Exemplo, 123 — pronto em até 48h</span></span>
+            </label>
+          </div>
+
+          <div id="addrFields" style="margin-top:16px">
+            <div class="co-row">
+              <div class="co-field"><label for="cep">CEP *</label><input id="cep" name="cep" inputmode="numeric" placeholder="00000-000" /><span class="co-err">Informe o CEP.</span></div>
+              <div class="co-field"><label for="numero">Número *</label><input id="numero" name="numero" placeholder="123" /><span class="co-err">Informe o número.</span></div>
+              <div class="co-field full"><label for="rua">Endereço *</label><input id="rua" name="rua" autocomplete="address-line1" placeholder="Rua, avenida..." /><span class="co-err">Informe o endereço.</span></div>
+              <div class="co-field"><label for="bairro">Bairro *</label><input id="bairro" name="bairro" placeholder="Bairro" /><span class="co-err">Informe o bairro.</span></div>
+              <div class="co-field"><label for="comp">Complemento</label><input id="comp" name="comp" placeholder="Apto, bloco (opcional)" /></div>
+              <div class="co-field"><label for="cidade">Cidade *</label><input id="cidade" name="cidade" placeholder="Cidade" /><span class="co-err">Informe a cidade.</span></div>
+              <div class="co-field"><label for="uf">UF *</label><input id="uf" name="uf" maxlength="2" placeholder="UF" /><span class="co-err">UF.</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pagamento -->
+        <section class="co-card">
+          <h2><span class="co-step">3</span> Pagamento</h2>
+          <div class="opt-list" id="payOpts">
+            <label class="opt sel"><input type="radio" name="pagamento" value="pix" checked />
+              <span class="o-ic"><svg viewBox="0 0 24 24"><path d="M12 3l9 9-9 9-9-9 9-9Z"/></svg></span>
+              <span class="o-main"><span class="o-title">Pix</span><span class="o-sub">Aprovação na hora</span></span>
+              <span class="o-tag">5% OFF</span>
+            </label>
+            <label class="opt"><input type="radio" name="pagamento" value="cartao" />
+              <span class="o-ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg></span>
+              <span class="o-main"><span class="o-title">Cartão de crédito</span><span class="o-sub">Em até 10x sem juros</span></span>
+            </label>
+            <label class="opt"><input type="radio" name="pagamento" value="boleto" />
+              <span class="o-ic"><svg viewBox="0 0 24 24"><path d="M4 5v14M8 5v14M11 5v14M15 5v14M18 5v14"/></svg></span>
+              <span class="o-main"><span class="o-title">Boleto bancário</span><span class="o-sub">Compensação em até 2 dias úteis</span></span>
+            </label>
+          </div>
+
+          <!-- painéis dinâmicos -->
+          <div class="pay-panel" data-pay="pix">Você receberá o código <b>Pix copia e cola</b> na próxima etapa. Pagamento com <b>5% de desconto</b> à vista.</div>
+          <div class="pay-panel" data-pay="cartao" hidden>
+            <div class="co-row">
+              <div class="co-field full"><label for="ccnum">Número do cartão *</label><input id="ccnum" inputmode="numeric" placeholder="0000 0000 0000 0000" autocomplete="cc-number" /><span class="co-err">Número inválido.</span></div>
+              <div class="co-field full"><label for="ccname">Nome impresso no cartão *</label><input id="ccname" placeholder="Como está no cartão" autocomplete="cc-name" /><span class="co-err">Informe o nome.</span></div>
+              <div class="co-field"><label for="ccval">Validade *</label><input id="ccval" inputmode="numeric" placeholder="MM/AA" autocomplete="cc-exp" /><span class="co-err">MM/AA.</span></div>
+              <div class="co-field"><label for="cccvv">CVV *</label><input id="cccvv" inputmode="numeric" placeholder="123" autocomplete="cc-csc" /><span class="co-err">CVV.</span></div>
+              <div class="co-field full"><label for="ccparc">Parcelas</label><select id="ccparc"></select></div>
+            </div>
+          </div>
+          <div class="pay-panel" data-pay="boleto" hidden>O boleto será gerado e enviado na próxima etapa. O pedido é confirmado após a compensação.</div>
+        </section>
+      </form>
+
+      <!-- RESUMO -->
+      <aside class="co-summary" id="coSummary">
+        <h2>Resumo do pedido</h2>
+        <div class="sum-items" id="sumItems"></div>
+        <div class="sum-rows">
+          <div class="sum-row"><span>Subtotal</span><span id="sumSubtotal">R$ 0,00</span></div>
+          <div class="sum-row discount" id="sumDiscountRow" hidden><span>Desconto Pix (5%)</span><span id="sumDiscount">- R$ 0,00</span></div>
+          <div class="sum-row"><span>Frete</span><span class="free" id="sumFrete">Grátis</span></div>
+          <div class="sum-row total"><span>Total</span><span id="sumTotal">R$ 0,00</span></div>
+        </div>
+        <button class="btn btn-primary btn-block btn-lg co-submit" type="submit" form="checkoutForm" id="coSubmit">Finalizar pedido</button>
+        <div class="co-trust">
+          <span>🔒 Dados protegidos</span><span>↩ Troca em 7 dias</span><span>★ Garantia Relux</span>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- SUCESSO -->
+  <div class="co-success" id="coSuccess" aria-hidden="true">
+    <div class="cs-card">
+      <div class="cs-check"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h2>Pedido recebido!</h2>
+      <p>Obrigado pela preferência. Veja os próximos passos abaixo.</p>
+      <div class="cs-order" id="csOrder">Nº RLX-000000</div>
+      <div class="cs-pix" id="csPix" hidden></div>
+      <p id="csMsg" style="color:var(--muted);font-size:.88rem;margin-top:10px"></p>
+      <div class="cs-actions">
+        <a class="btn btn-primary btn-lg" id="csWhats" target="_blank" rel="noopener">Enviar pedido no WhatsApp</a>
+        <a class="btn btn-ghost" href="index.html">Voltar à loja</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/payments-mp.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/checkout.js"></script>
+</body>
+</html>

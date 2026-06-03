@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Sprite of glasses silhouettes used via <use href="...#id">.
+       All use currentColor so they inherit text color per theme. -->
+  <defs>
+    <style>
+      .gl{fill:none;stroke:currentColor;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;}
+      .gf{fill:currentColor;opacity:.14;}
+    </style>
+  </defs>
+
+  <!-- Aviator / Sun -->
+  <g id="sun">
+    <path class="gf" d="M30 32h44a8 8 0 0 1 8 8v6a22 22 0 0 1-44 2l-1-8a8 8 0 0 1 -7-8Z"/>
+    <path class="gf" d="M126 32h44a8 8 0 0 1 0 8l-1 8a22 22 0 0 1-44-2v-6a8 8 0 0 1 1-8Z"/>
+    <path class="gl" d="M28 34h48a6 6 0 0 1 6 6v4a24 24 0 0 1-48 0v-4a6 6 0 0 1-6-6Z"/>
+    <path class="gl" d="M118 34h48a6 6 0 0 1 6 6v4a24 24 0 0 1-48 0v-4a6 6 0 0 1-6-6Z" transform="translate(6 0)"/>
+    <path class="gl" d="M88 44c4-4 14-4 18 0"/>
+    <path class="gl" d="M28 34l-12-6M178 34l12-6"/>
+  </g>
+
+  <!-- Square optical -->
+  <g id="optic">
+    <rect class="gf" x="26" y="28" width="56" height="34" rx="9"/>
+    <rect class="gf" x="118" y="28" width="56" height="34" rx="9"/>
+    <rect class="gl" x="26" y="28" width="56" height="34" rx="9"/>
+    <rect class="gl" x="118" y="28" width="56" height="34" rx="9"/>
+    <path class="gl" d="M82 40c6-4 12-4 18 0"/>
+    <path class="gl" d="M26 34l-12-3M174 34l12-3"/>
+  </g>
+
+  <!-- Round -->
+  <g id="round">
+    <circle class="gf" cx="56" cy="44" r="26"/>
+    <circle class="gf" cx="144" cy="44" r="26"/>
+    <circle class="gl" cx="56" cy="44" r="26"/>
+    <circle class="gl" cx="144" cy="44" r="26"/>
+    <path class="gl" d="M82 40c6-3 12-3 18 0"/>
+    <path class="gl" d="M30 38l-14-4M170 38l14-4"/>
+  </g>
+
+  <!-- Sport shield -->
+  <g id="sport">
+    <path class="gf" d="M22 34c30-10 96-10 126 0 6 2 4 18-6 22-24 10-44 4-50-6-2-3-6-3-8 0-6 10-26 16-50 6-10-4-12-20-12-22Z"/>
+    <path class="gl" d="M22 34c30-10 96-10 126 0 6 2 4 18-6 22-24 10-44 4-50-6-2-3-6-3-8 0-6 10-26 16-50 6-10-4-12-20-12-22Z"/>
+  </g>
+
+  <!-- Lens (contact) -->
+  <g id="lens">
+    <ellipse class="gf" cx="100" cy="42" rx="48" ry="30"/>
+    <ellipse class="gl" cx="100" cy="42" rx="48" ry="30"/>
+    <circle class="gl" cx="100" cy="42" r="20"/>
+    <path class="gl" d="M84 30a26 22 0 0 1 14-6"/>
+  </g>
+</svg>

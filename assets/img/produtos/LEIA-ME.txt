@@ -1,0 +1,18 @@
+COLOQUE AS FOTOS DOS PRODUTOS NESTA PASTA
+==========================================
+
+Salve as 4 imagens (de preferência PNG com fundo transparente) com EXATAMENTE
+estes nomes:
+
+  sol.png        -> Óculos de sol (aviador dourado, lente escura)
+  grau.png       -> Óculos de grau (aviador dourado, lente clara)
+  lente.png      -> Lente de contato
+  infantil.png   -> Óculos infantil (azul/verde)
+
+Assim que os arquivos estiverem aqui, recarregue a página (F5) — o site usa
+as fotos automaticamente. Enquanto não estiverem, ele mostra um desenho (SVG)
+no lugar, sem quebrar o layout.
+
+Dica: imagens quadradas ou na proporção ~4:3 ficam melhores.
+Para adicionar mais produtos, edite o arquivo assets/js/products.js
+(campo "img" de cada produto).
