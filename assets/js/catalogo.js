@@ -86,6 +86,8 @@
     if (clear) clear.addEventListener("click", function () { state.q = ""; state.cat = ""; render(); });
 
     render();
+    /* re-renderiza quando o catálogo do Supabase terminar de carregar */
+    if (R.whenReady) R.whenReady(render);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

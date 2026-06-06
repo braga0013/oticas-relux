@@ -77,6 +77,8 @@
     document.addEventListener("relux:change", render);
 
     render();
+    /* re-renderiza quando o catálogo do Supabase terminar de carregar */
+    if (window.RELUX && window.RELUX.whenReady) window.RELUX.whenReady(render);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

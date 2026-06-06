@@ -8,6 +8,7 @@
   function el(id) { return document.getElementById(id); }
   function set(id, txt) { var e = el(id); if (e) e.textContent = txt; }
 
+  function run() {
   var WA = (window.RELUX_CONFIG && window.RELUX_CONFIG.whatsapp) || "5500000000000";
   var list = window.RELUX_PRODUCTS || [];
   var id = qs("id");
@@ -50,8 +51,9 @@
   set("pdpNow", p.price);
   set("pdpInstallment", p.installment);
 
-  /* rating */
-  set("pdpRating", p.rating + " · " + p.reviews + " avaliações");
+  /* rating (oculta quando o produto não tem avaliações, ex.: lentes do catálogo) */
+  if (p.reviews) set("pdpRating", p.rating + " · " + p.reviews + " avaliações");
+  else { var rtEl = el("pdpRating"); if (rtEl) rtEl.style.display = "none"; }
 
   /* cores → chips */
   var colors = el("pdpColors");
@@ -165,4 +167,10 @@
   setMeta("product:condition", "new");
   if (p.img) setMeta("og:image", window.location.origin + "/" + p.img);
   document.title = p.name + " — Óticas Relux";
+  }
+
+  /* espera DOM + catálogo do Supabase antes de renderizar */
+  if (window.RELUX && window.RELUX.whenReady) window.RELUX.whenReady(run);
+  else if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run);
+  else run();
 })();

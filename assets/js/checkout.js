@@ -424,6 +424,9 @@
 
     // re-render se a sacola mudar (ex.: via drawer)
     document.addEventListener("relux:change", function () { renderSummary(); fillInstallments(); });
+
+    // re-render quando o catálogo do Supabase carregar (itens podem ser lentes do banco)
+    if (R.whenReady) R.whenReady(function () { renderSummary(); fillInstallments(); });
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

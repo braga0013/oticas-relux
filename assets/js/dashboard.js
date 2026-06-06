@@ -17,6 +17,8 @@
       el("loginBox").style.display = "none";
       el("dashContent").style.display = "";
       loadDash();
+      /* recarrega os números quando o catálogo do Supabase chegar */
+      if (window.RELUX && window.RELUX.whenReady) window.RELUX.whenReady(loadDash);
     }
   }
 

@@ -8,6 +8,11 @@ window.RELUX_CONFIG = {
   whatsapp: "5500000000000",
   mpPublicKey: "",
   apiBase: "",
+  /* Supabase — catálogo dinâmico (as lentes vêm de lá).
+     supabaseUrl: URL do projeto (https://<ref>.supabase.co)
+     supabaseKey: chave PÚBLICA/anon (somente leitura via RLS). */
+  supabaseUrl: "https://joktfcfcssxhhyiuxwer.supabase.co",
+  supabaseKey: "sb_publishable_vxUtkkhNJ8Z_U_4EkuTutg_HY-pB-Gj",
 };
 
 /* ÓTICAS RELUX — base de produtos (compartilhada entre home e página de produto)
@@ -155,6 +160,71 @@ window.RELUX = window.RELUX || {};
     var extra = JSON.parse(localStorage.getItem("relux-products-extra")) || [];
     if (extra.length) window.RELUX_PRODUCTS = window.RELUX_PRODUCTS.concat(extra);
   } catch (e) {}
+})();
+
+/* ============================================================
+   Catálogo dinâmico via Supabase (ex.: lentes Oftalsul).
+   Busca a tabela "produtos" e injeta em RELUX_PRODUCTS.
+   Expõe RELUX.productsReady (Promise) e RELUX.whenReady(cb)
+   para as páginas renderizarem só depois que os dados chegarem.
+   ============================================================ */
+(function () {
+  function fmtPrice(v) {
+    var n = Number(v);
+    if (!isFinite(n) || n <= 0) return "";
+    return "R$ " + n.toFixed(2).replace(".", ",");
+  }
+  /* converte uma linha do banco no formato de produto do site */
+  function mapRow(r) {
+    return {
+      id: r.id,
+      brand: r.brand || "Oftalsul",
+      name: r.name || r.id,
+      category: r.category || "Lentes de Contato",
+      img: r.img || "",
+      shape: r.shape || "g-lens",
+      tone: r.tone || "c",
+      price: fmtPrice(r.price),
+      oldPrice: r.old_price ? fmtPrice(r.old_price) : "",
+      badge: r.badge || "",
+      installment: r.installment || "",
+      rating: "",
+      reviews: "",
+      colors: Array.isArray(r.colors) ? r.colors : [],
+      desc: r.descricao || "",
+      specs: Array.isArray(r.specs) ? r.specs : [],
+      _source: "supabase",
+    };
+  }
+
+  var cfg = window.RELUX_CONFIG || {};
+  var ready;
+  if (!cfg.supabaseUrl || !cfg.supabaseKey) {
+    ready = Promise.resolve(); // sem config = só produtos locais
+  } else {
+    var url = cfg.supabaseUrl.replace(/\/+$/, "") +
+      "/rest/v1/produtos?select=*&active=eq.true&order=sort.asc";
+    ready = fetch(url, {
+      headers: { apikey: cfg.supabaseKey, Authorization: "Bearer " + cfg.supabaseKey },
+    })
+      .then(function (res) { return res.ok ? res.json() : []; })
+      .then(function (rows) {
+        var have = {};
+        window.RELUX_PRODUCTS.forEach(function (p) { have[p.id] = true; });
+        (rows || []).forEach(function (r) {
+          if (!have[r.id]) window.RELUX_PRODUCTS.push(mapRow(r));
+        });
+      })
+      .catch(function () { /* offline/erro: mantém produtos locais */ });
+  }
+
+  window.RELUX.productsReady = ready;
+  /* chama cb quando DOM + produtos do Supabase estiverem prontos */
+  window.RELUX.whenReady = function (cb) {
+    function go() { ready.then(function () { try { cb(); } catch (e) {} }); }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go);
+    else go();
+  };
 })();
 
 window.RELUX.findProduct = function (id) {
