@@ -15,3 +15,5 @@ skills-lock.json
 # Sistema operacional
 .DS_Store
 Thumbs.db
+
+.vercel
