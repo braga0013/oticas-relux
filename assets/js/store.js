@@ -83,6 +83,7 @@
       // FAV
       '<aside class="drawer" id="favDrawer" aria-hidden="true" aria-label="Seus favoritos">' +
         '<header class="drawer-head"><h3>Favoritos <span class="drawer-count" id="favHeadCount"></span></h3>' +
+          '<a class="drawer-link" href="favoritos.html" style="margin-right:auto;font-size:.8rem;">Ver todos</a>' +
           '<button class="drawer-close" type="button" data-close aria-label="Fechar">' + closeIco() + "</button></header>" +
         '<div class="drawer-body" id="favBody"></div>' +
       "</aside>" +

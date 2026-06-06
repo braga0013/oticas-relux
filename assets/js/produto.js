@@ -124,4 +124,45 @@
 
   /* sincroniza corações + contadores (já com PDP e relacionados no DOM) */
   if (window.RELUX && window.RELUX.refreshUI) window.RELUX.refreshUI();
+
+  /* ── Schema.org (Google Shopping) ── */
+  var priceNum = p.price.replace(/[^\d,]/g, "").replace(",", ".");
+  var schemaData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": p.name,
+    "description": p.desc || "",
+    "sku": p.id,
+    "brand": { "@type": "Brand", "name": p.brand },
+    "offers": {
+      "@type": "Offer",
+      "url": window.location.href,
+      "priceCurrency": "BRL",
+      "price": priceNum,
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition"
+    }
+  };
+  if (p.img) schemaData.image = window.location.origin + "/" + p.img;
+  var schemaScript = document.createElement("script");
+  schemaScript.type = "application/ld+json";
+  schemaScript.textContent = JSON.stringify(schemaData);
+  document.head.appendChild(schemaScript);
+
+  /* ── Open Graph dinâmico ── */
+  function setMeta(prop, content, isName) {
+    var attr = isName ? "name" : "property";
+    var el = document.querySelector('meta[' + attr + '="' + prop + '"]');
+    if (!el) { el = document.createElement("meta"); el.setAttribute(attr, prop); document.head.appendChild(el); }
+    el.setAttribute("content", content);
+  }
+  setMeta("og:title", p.name + " — Óticas Relux");
+  setMeta("og:description", p.desc || "");
+  setMeta("og:type", "og:product");
+  setMeta("og:price:amount", priceNum);
+  setMeta("og:price:currency", "BRL");
+  setMeta("product:availability", "in stock");
+  setMeta("product:condition", "new");
+  if (p.img) setMeta("og:image", window.location.origin + "/" + p.img);
+  document.title = p.name + " — Óticas Relux";
 })();

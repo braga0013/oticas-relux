@@ -84,4 +84,14 @@
   /* ---------- Footer year ---------- */
   var y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
+
+  /* ---------- Rastreio de visitas ---------- */
+  try {
+    var visKey = "relux-visits";
+    var vis = JSON.parse(localStorage.getItem(visKey)) || { total: 0, hoje: 0, diaAtual: "" };
+    var hoje = new Date().toISOString().slice(0, 10);
+    if (vis.diaAtual !== hoje) { vis.hoje = 0; vis.diaAtual = hoje; }
+    vis.total += 1; vis.hoje += 1;
+    localStorage.setItem(visKey, JSON.stringify(vis));
+  } catch (e) {}
 })();

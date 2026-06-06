@@ -148,6 +148,15 @@ window.RELUX_PRODUCTS = [
 
 /* ---------- helpers ---------- */
 window.RELUX = window.RELUX || {};
+
+/* Carrega produtos extras cadastrados via admin */
+(function () {
+  try {
+    var extra = JSON.parse(localStorage.getItem("relux-products-extra")) || [];
+    if (extra.length) window.RELUX_PRODUCTS = window.RELUX_PRODUCTS.concat(extra);
+  } catch (e) {}
+})();
+
 window.RELUX.findProduct = function (id) {
   return (window.RELUX_PRODUCTS || []).filter(function (p) { return p.id === id; })[0] || null;
 };

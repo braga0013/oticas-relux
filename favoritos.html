@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Favoritos — Óticas Relux</title>
+  <meta name="description" content="Seus produtos favoritos na Óticas Relux." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="0.5" stop-color="#a7adb6"/><stop offset="1" stop-color="#6f757e"/></linearGradient>
+      <radialGradient id="iris" cx="0.38" cy="0.35" r="0.75"><stop offset="0" stop-color="#ffe066"/><stop offset="0.55" stop-color="#f5be00"/><stop offset="1" stop-color="#c8920a"/></radialGradient>
+    </defs>
+    <symbol id="eye" viewBox="0 0 120 70"><path d="M6 34 C 30 8, 92 8, 116 30 C 92 18, 40 20, 14 38 Z" fill="url(#silver)"/><path d="M10 40 C 34 60, 92 60, 112 42 C 90 54, 40 56, 18 44 Z" fill="#f3f4f6"/><circle cx="68" cy="34" r="15.5" fill="url(#iris)"/><circle cx="71" cy="36" r="6.4" fill="#0a0a0a"/><circle cx="64.5" cy="29.5" r="2.6" fill="#fff" opacity="0.9"/></symbol>
+    <symbol id="g-sun" viewBox="0 0 200 80"><path d="M28 34h48a6 6 0 0 1 6 6v4a24 24 0 0 1-48 0v-4a6 6 0 0 1-6-6Z" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M124 34h48a6 6 0 0 1 6 6v4a24 24 0 0 1-48 0v-4a6 6 0 0 1-6-6Z" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/><path d="M88 44c4-4 18-4 24 0M28 34l-12-6M178 34l12-6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="g-optic" viewBox="0 0 200 80"><rect x="26" y="28" width="56" height="34" rx="9" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><rect x="118" y="28" width="56" height="34" rx="9" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><path d="M82 40c6-4 12-4 18 0M26 34l-12-3M174 34l12-3" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="g-round" viewBox="0 0 200 80"><circle cx="56" cy="44" r="26" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><circle cx="144" cy="44" r="26" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><path d="M82 40c6-3 12-3 18 0M30 38l-14-4M170 38l14-4" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="g-sport" viewBox="0 0 200 80"><path d="M22 34c30-10 96-10 126 0 6 2 4 18-6 22-24 10-44 4-50-6-2-3-6-3-8 0-6 10-26 16-50 6-10-4-12-20-12-22Z" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></symbol>
+    <symbol id="g-lens" viewBox="0 0 200 80"><ellipse cx="100" cy="42" rx="48" ry="30" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="4"/><circle cx="100" cy="42" r="20" fill="none" stroke="currentColor" stroke-width="4"/><path d="M84 30a26 22 0 0 1 14-6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <!-- nav -->
+  <header class="nav-wrap" id="navWrap">
+    <nav class="nav" aria-label="Navegação principal">
+      <a href="index.html" class="nav-brand" aria-label="Óticas Relux">
+        <svg class="brand-eye" viewBox="0 0 120 70" width="34" height="22" aria-hidden="true"><use href="#eye" /></svg>
+        <span class="brand-text"><b>ÓTICAS</b> RELUX</span>
+      </a>
+      <form class="nav-search js-search-form" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input class="js-search-input" type="search" placeholder="Buscar óculos, marcas, lentes..." aria-label="Buscar produtos" />
+      </form>
+      <div class="nav-actions">
+        <a class="icon-btn account-btn" id="accountBtn" href="conta.html" aria-label="Entrar ou criar conta">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <span class="acct-name" id="acctName"></span>
+        </a>
+        <button class="icon-btn is-fav-page" id="favBtn" type="button" aria-label="Favoritos" aria-current="page">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.3C.7 9 1.6 5.7 4.7 4.8 6.8 4.2 9 5 12 8c3-3 5.2-3.8 7.3-3.2 3.1.9 4 4.2 2.7 6.9C19.5 16.4 12 21 12 21Z"/></svg>
+          <span class="count" id="favCount">0</span>
+        </button>
+        <button class="icon-btn" id="cartBtn" type="button" aria-label="Sacola">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8h11l-1 11.5a1.5 1.5 0 0 1-1.5 1.4H9a1.5 1.5 0 0 1-1.5-1.4L6.5 8Z"/><path d="M9.2 8a2.8 2.8 0 0 1 5.6 0"/></svg>
+          <span class="count" id="cartCount">0</span>
+        </button>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Alternar tema claro e escuro" title="Alternar tema">
+          <svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.2" /><g stroke-linecap="round"><line x1="12" y1="2.5" x2="12" y2="5" /><line x1="12" y1="19" x2="12" y2="21.5" /><line x1="2.5" y1="12" x2="5" y2="12" /><line x1="19" y1="12" x2="21.5" y2="12" /><line x1="5.2" y1="5.2" x2="6.9" y2="6.9" /><line x1="17.1" y1="17.1" x2="18.8" y2="18.8" /><line x1="18.8" y1="5.2" x2="17.1" y2="6.9" /><line x1="6.9" y1="17.1" x2="5.2" y2="18.8" /></g></svg>
+          <svg class="ico-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4 7 7 0 1 0 20 14.5Z" /></svg>
+        </button>
+        <button class="hamburger" id="hamburger" type="button" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span></button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <form class="js-search-form mobile-search" role="search">
+      <input class="js-search-input" type="search" placeholder="Buscar..." aria-label="Buscar" />
+    </form>
+    <a href="catalogo.html?cat=Óculos de Sol" data-link>Óculos de Sol</a>
+    <a href="catalogo.html?cat=Óculos de Grau">Óculos de Grau</a>
+    <a href="catalogo.html?cat=Lentes de Contato">Lentes de Contato</a>
+    <a href="catalogo.html?cat=Linha Infantil">Linha Infantil</a>
+    <a href="index.html#contato">Contato</a>
+  </div>
+
+  <main class="catalog">
+    <div class="container">
+      <header class="cat-head">
+        <span class="eyebrow">
+          <i></i>
+          <a href="index.html" style="color:inherit;text-decoration:none;">Início</a>
+          &rsaquo; Favoritos
+        </span>
+        <h1 class="section-title">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:.35em;" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.3C.7 9 1.6 5.7 4.7 4.8 6.8 4.2 9 5 12 8c3-3 5.2-3.8 7.3-3.2 3.1.9 4 4.2 2.7 6.9C19.5 16.4 12 21 12 21Z"/></svg>
+          Meus Favoritos
+        </h1>
+        <p class="section-sub" id="favPageCount">Carregando...</p>
+      </header>
+
+      <div class="cat-toolbar" id="favToolbar">
+        <label class="cat-sort">
+          <span>Ordenar</span>
+          <select id="favSort">
+            <option value="rel">Adicionados recentemente</option>
+            <option value="menor">Menor preço</option>
+            <option value="maior">Maior preço</option>
+            <option value="nome">Nome (A–Z)</option>
+          </select>
+        </label>
+        <button class="btn btn-ghost btn-sm" id="favClearAll" type="button" hidden>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          Limpar todos
+        </button>
+      </div>
+
+      <div class="products" id="favGrid"></div>
+
+      <div class="cat-empty" id="favEmpty" hidden>
+        <div class="de-ico">
+          <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.3C.7 9 1.6 5.7 4.7 4.8 6.8 4.2 9 5 12 8c3-3 5.2-3.8 7.3-3.2 3.1.9 4 4.2 2.7 6.9C19.5 16.4 12 21 12 21Z"/></svg>
+        </div>
+        <h3>Nenhum favorito ainda</h3>
+        <p>Toque no <b>♥</b> de qualquer produto para salvá-lo aqui e encontrá-lo facilmente depois.</p>
+        <a class="btn btn-primary" href="catalogo.html">Explorar catálogo</a>
+      </div>
+    </div>
+  </main>
+
+  <a class="wa-float" href="https://wa.me/5500000000000" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+    <svg viewBox="0 0 24 24" width="26" height="26"><path d="M3 21l1.6-4.8A8 8 0 1 1 7.8 19.4L3 21Z"/><path d="M8.5 8.5c0 4 3 7 7 7"/></svg>
+  </a>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/favoritos.js"></script>
+</body>
+</html>

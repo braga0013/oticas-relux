@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerenciar Produtos — Óticas Relux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+  <style>
+    .adm-wrap { padding: 32px 0 80px; min-height: 100vh; }
+    .adm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 12px; }
+    .adm-section { background: var(--bg-2); border: 1px solid var(--hair); border-radius: var(--r-md); padding: 24px; margin-bottom: 24px; }
+    .adm-section h3 { font-size: 1rem; margin-bottom: 16px; }
+    .adm-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    .adm-table th { text-align: left; padding: 8px 10px; color: var(--muted); font-weight: 600; font-size: .75rem; text-transform: uppercase; border-bottom: 1px solid var(--hair); }
+    .adm-table td { padding: 10px 10px; border-bottom: 1px solid var(--hair-soft); vertical-align: middle; }
+    .btn-rm { background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.2); border-radius: 999px; padding: 3px 12px; font-size: .78rem; cursor: pointer; font-weight: 600; }
+    .btn-rm:hover { background: rgba(239,68,68,.2); }
+
+    /* Formulário */
+    .adm-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+    .adm-field { display: flex; flex-direction: column; gap: 5px; }
+    .adm-field label { font-size: .78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .adm-field input, .adm-field select, .adm-field textarea {
+      background: var(--bg); border: 1px solid var(--hair); border-radius: var(--r-sm);
+      color: var(--ink); font-family: inherit; font-size: .9rem; padding: 9px 12px;
+    }
+    .adm-field input:focus, .adm-field textarea:focus, .adm-field select:focus { outline: 2px solid var(--gold); }
+    .adm-field.full { grid-column: 1 / -1; }
+    .adm-field textarea { min-height: 80px; resize: vertical; }
+    .form-msg { color: #16a34a; font-size: .85rem; font-weight: 600; }
+
+    /* CSV */
+    .csv-area { width: 100%; min-height: 120px; background: var(--bg); border: 1px solid var(--hair); border-radius: var(--r-sm); color: var(--ink); font-family: monospace; font-size: .8rem; padding: 12px; resize: vertical; }
+    .csv-hint { font-size: .78rem; color: var(--muted); margin-top: 8px; }
+    .csv-hint code { background: var(--surface-2); border-radius: 4px; padding: 1px 5px; font-size: .75rem; }
+
+    /* Login */
+    .login-box { max-width: 360px; margin: 80px auto; background: var(--bg-2); border: 1px solid var(--hair); border-radius: var(--r-lg); padding: 40px 32px; text-align: center; }
+    .login-box h2 { margin-bottom: 8px; }
+    .login-box p { color: var(--muted); font-size: .9rem; margin-bottom: 24px; }
+    .login-box input { width: 100%; padding: 12px 16px; border: 1px solid var(--hair); border-radius: var(--r-sm); background: var(--bg); color: var(--ink); font-family: inherit; font-size: .95rem; margin-bottom: 14px; }
+    .login-box input:focus { outline: 2px solid var(--gold); }
+    .err-msg { color: #ef4444; font-size: .85rem; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="0.5" stop-color="#a7adb6"/><stop offset="1" stop-color="#6f757e"/></linearGradient>
+      <radialGradient id="iris" cx="0.38" cy="0.35" r="0.75"><stop offset="0" stop-color="#ffe066"/><stop offset="0.55" stop-color="#f5be00"/><stop offset="1" stop-color="#c8920a"/></radialGradient>
+    </defs>
+    <symbol id="eye" viewBox="0 0 120 70">
+      <path d="M6 34 C 30 8, 92 8, 116 30 C 92 18, 40 20, 14 38 Z" fill="url(#silver)"/>
+      <path d="M10 40 C 34 60, 92 60, 112 42 C 90 54, 40 56, 18 44 Z" fill="#f3f4f6"/>
+      <circle cx="68" cy="34" r="15.5" fill="url(#iris)"/>
+      <circle cx="71" cy="36" r="6.4" fill="#0a0a0a"/>
+      <circle cx="64.5" cy="29.5" r="2.6" fill="#ffffff" opacity="0.9"/>
+    </symbol>
+  </svg>
+
+  <!-- Login -->
+  <div id="loginBox" class="login-box" style="display:none">
+    <svg viewBox="0 0 120 70" width="60" height="36" style="margin:0 auto 16px" aria-hidden="true"><use href="#eye"/></svg>
+    <h2>Admin — Produtos</h2>
+    <p>Acesso restrito à equipe.</p>
+    <p id="loginError" class="err-msg" hidden>Senha incorreta.</p>
+    <form id="loginForm">
+      <input type="password" id="adminPw" placeholder="Senha" autocomplete="current-password" />
+      <button class="btn btn-primary btn-block" type="submit" style="width:100%;justify-content:center">Entrar</button>
+    </form>
+  </div>
+
+  <!-- Admin -->
+  <div id="adminContent" class="adm-wrap" style="display:none">
+    <div class="container">
+      <div class="adm-header">
+        <div>
+          <a href="dashboard.html" style="color:var(--muted);font-size:.85rem">← Dashboard</a>
+          <h1 style="font-size:1.5rem;margin-top:4px">Gerenciar Produtos <span id="totalCount" style="font-size:.9rem;font-weight:400;color:var(--muted)"></span></h1>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="exportBtn" type="button">Exportar JSON</button>
+          <button class="btn btn-ghost" id="clearExtras" type="button">Limpar adicionados</button>
+          <button class="btn btn-ghost" id="logoutBtn" type="button">Sair</button>
+        </div>
+      </div>
+
+      <!-- Adicionar individualmente -->
+      <div class="adm-section">
+        <h3>Adicionar produto</h3>
+        <form id="addForm">
+          <div class="adm-form">
+            <div class="adm-field">
+              <label>ID único *</label>
+              <input id="pId" placeholder="ex: oakley-new-2024" />
+            </div>
+            <div class="adm-field">
+              <label>Nome *</label>
+              <input id="pName" placeholder="Nome do produto" required />
+            </div>
+            <div class="adm-field">
+              <label>Marca *</label>
+              <input id="pBrand" placeholder="Ray-Ban, Oakley..." required />
+            </div>
+            <div class="adm-field">
+              <label>Categoria *</label>
+              <select id="pCategory" required>
+                <option value="">Selecione</option>
+                <option>Óculos de Sol</option>
+                <option>Óculos de Grau</option>
+                <option>Lentes de Contato</option>
+                <option>Linha Infantil</option>
+              </select>
+            </div>
+            <div class="adm-field">
+              <label>Preço *</label>
+              <input id="pPrice" placeholder="R$ 0,00" required />
+            </div>
+            <div class="adm-field">
+              <label>Preço antigo</label>
+              <input id="pOldPrice" placeholder="R$ 0,00 (opcional)" />
+            </div>
+            <div class="adm-field">
+              <label>Badge</label>
+              <input id="pBadge" placeholder="-20%, Novo..." />
+            </div>
+            <div class="adm-field">
+              <label>Parcelas</label>
+              <input id="pInstallment" placeholder="ou 10x de R$ 0,00 sem juros" />
+            </div>
+            <div class="adm-field">
+              <label>Avaliação</label>
+              <input id="pRating" placeholder="4.8" />
+            </div>
+            <div class="adm-field">
+              <label>Forma SVG</label>
+              <select id="pShape">
+                <option value="g-sun">Sol (g-sun)</option>
+                <option value="g-optic">Grau (g-optic)</option>
+                <option value="g-round">Redondo (g-round)</option>
+                <option value="g-sport">Esportivo (g-sport)</option>
+                <option value="g-lens">Lente (g-lens)</option>
+              </select>
+            </div>
+            <div class="adm-field">
+              <label>Tom (a/b/c/d)</label>
+              <select id="pTone">
+                <option value="a">a (amarelo)</option>
+                <option value="b">b (azul)</option>
+                <option value="c">c (verde)</option>
+                <option value="d">d (roxo)</option>
+              </select>
+            </div>
+            <div class="adm-field">
+              <label>URL da imagem</label>
+              <input id="pImg" placeholder="assets/img/produtos/nome.png" />
+            </div>
+            <div class="adm-field full">
+              <label>Cores (separadas por vírgula)</label>
+              <input id="pColors" placeholder="Preto, Dourado, Prata" />
+            </div>
+            <div class="adm-field full">
+              <label>Descrição</label>
+              <textarea id="pDesc" placeholder="Descrição do produto..."></textarea>
+            </div>
+            <div class="adm-field full">
+              <label>Especificações (uma por linha, formato <code>Chave: Valor</code>)</label>
+              <textarea id="pSpecs" placeholder="Material: Acetato&#10;Proteção: UV400&#10;Formato: Aviador"></textarea>
+            </div>
+          </div>
+          <div style="margin-top:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <button class="btn btn-primary" type="submit">Adicionar produto</button>
+            <span id="formMsg" class="form-msg" hidden></span>
+          </div>
+        </form>
+      </div>
+
+      <!-- Importação CSV -->
+      <div class="adm-section">
+        <h3>Importar via CSV (em massa)</h3>
+        <p class="csv-hint">Colunas obrigatórias: <code>id</code>, <code>name</code>, <code>brand</code>, <code>category</code>, <code>price</code><br>
+        Opcionais: <code>oldprice</code>, <code>badge</code>, <code>installment</code>, <code>rating</code>, <code>img</code>, <code>shape</code>, <code>tone</code>, <code>colors</code> (separados por <code>|</code>), <code>desc</code><br>
+        Exemplo: <code>id,name,brand,category,price,colors,desc</code></p>
+        <textarea class="csv-area" id="csvArea" placeholder="id,name,brand,category,price,oldprice,badge,installment,colors,desc&#10;meu-produto-1,Óculos Top,Ray-Ban,Óculos de Sol,R$ 599,,,-20%,10x de R$ 59,90,Preto|Dourado,Óculos incrível..."></textarea>
+        <div style="margin-top:12px">
+          <button class="btn btn-primary" id="csvImport" type="button">Importar CSV</button>
+        </div>
+      </div>
+
+      <!-- Tabela de produtos -->
+      <div class="adm-section">
+        <h3>Todos os produtos</h3>
+        <div style="overflow-x:auto">
+          <table class="adm-table">
+            <thead>
+              <tr>
+                <th>Marca</th>
+                <th>Nome</th>
+                <th>Categoria</th>
+                <th>Preço</th>
+                <th>ID</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody id="prodBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/admin-produtos.js"></script>
+</body>
+</html>

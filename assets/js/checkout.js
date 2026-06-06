@@ -45,7 +45,9 @@
     var disc = payMethod() === "pix" ? sub * PIX_OFF : 0;
     var drow = el("sumDiscountRow");
     if (disc > 0) { drow.hidden = false; el("sumDiscount").textContent = "- " + fmt(disc); } else { drow.hidden = true; }
-    el("sumTotal").textContent = fmt(sub - disc);
+    var freteEl = el("sumFrete");
+    if (freteEl) freteEl.textContent = freteAtual > 0 ? fmt(freteAtual) : "Grátis";
+    el("sumTotal").textContent = fmt(sub - disc + freteAtual);
   }
 
   /* ---------- parcelas do cartão ---------- */
@@ -69,7 +71,107 @@
   function mVal(v) { v = onlyDigits(v).slice(0, 4); return v.length > 2 ? v.slice(0, 2) + "/" + v.slice(2) : v; }
   function mCvv(v) { return onlyDigits(v).slice(0, 4); }
 
-  /* ---------- ViaCEP (autofill, opcional) ---------- */
+  /* ---------- Cálculo de Frete ---------- */
+  var freteAtual = 0;
+  var FRETE_GRATIS_ACIMA = 300;
+
+  /* Tabela de fallback (usada apenas se a API não estiver configurada) */
+  var FRETE_FALLBACK = {
+    SP: { pac: { preco: 12.90, dias: 6 }, sedex: { preco: 24.90, dias: 2 } },
+    RJ: { pac: { preco: 15.90, dias: 7 }, sedex: { preco: 27.90, dias: 2 } },
+    ES: { pac: { preco: 15.90, dias: 7 }, sedex: { preco: 27.90, dias: 3 } },
+    MG: { pac: { preco: 15.90, dias: 7 }, sedex: { preco: 27.90, dias: 3 } },
+    PR: { pac: { preco: 17.90, dias: 8 }, sedex: { preco: 29.90, dias: 3 } },
+    SC: { pac: { preco: 17.90, dias: 8 }, sedex: { preco: 29.90, dias: 3 } },
+    RS: { pac: { preco: 17.90, dias: 8 }, sedex: { preco: 32.90, dias: 3 } },
+  };
+  var FRETE_FALLBACK_PADRAO = { pac: { preco: 22.90, dias: 10 }, sedex: { preco: 38.90, dias: 4 } };
+
+  function diasLabel(n) { return n + (n === 1 ? " dia útil" : " dias úteis"); }
+
+  function optHTML(val, label, preco, dias, checked) {
+    return '<label class="opt' + (checked ? " sel" : "") + '">' +
+      '<input type="radio" name="frete_tipo" value="' + val + '"' + (checked ? " checked" : "") + '/>' +
+      '<span class="o-ic"><svg viewBox="0 0 24 24"><path d="M3 7h13l5 5v5h-2M3 7v10h2M16 7v10M5 17a2 2 0 1 0 4 0 2 2 0 1 0-4 0Zm10 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0Z"/></svg></span>' +
+      '<span class="o-main"><span class="o-title">' + label + ' — Correios</span><span class="o-sub">Prazo: ' + diasLabel(dias) + '</span></span>' +
+      '<span class="o-tag">' + fmt(preco) + '</span></label>';
+  }
+
+  function bindFreteList(opcoes) {
+    var list = el("freteList"); if (!list) return;
+    list.addEventListener("change", function () {
+      list.querySelectorAll(".opt").forEach(function (o) { o.classList.toggle("sel", o.querySelector("input").checked); });
+      var sel = list.querySelector('input[name="frete_tipo"]:checked');
+      if (sel) {
+        var idx = parseInt(sel.getAttribute("data-idx"), 10);
+        freteAtual = opcoes[idx] ? opcoes[idx].preco : 0;
+      }
+      renderSummary();
+    });
+  }
+
+  function showFreteOpts(opcoes) {
+    var box = el("freteOpts"); if (!box) return;
+    box.innerHTML =
+      '<h4 style="font-size:.85rem;font-weight:600;margin-bottom:8px;color:var(--muted)">Opções de envio</h4>' +
+      '<div class="opt-list" id="freteList">' +
+      opcoes.map(function (op, i) {
+        return '<label class="opt' + (i === 0 ? " sel" : "") + '">' +
+          '<input type="radio" name="frete_tipo" data-idx="' + i + '" value="op' + i + '"' + (i === 0 ? " checked" : "") + '/>' +
+          '<span class="o-ic"><svg viewBox="0 0 24 24"><path d="M3 7h13l5 5v5h-2M3 7v10h2M16 7v10M5 17a2 2 0 1 0 4 0 2 2 0 1 0-4 0Zm10 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0Z"/></svg></span>' +
+          '<span class="o-main"><span class="o-title">' + op.nome + ' — ' + (op.empresa || "Correios") + '</span>' +
+          '<span class="o-sub">Prazo: ' + diasLabel(op.dias) + '</span></span>' +
+          '<span class="o-tag">' + fmt(op.preco) + '</span></label>';
+      }).join("") +
+      '</div>';
+    freteAtual = opcoes[0].preco;
+    renderSummary();
+    bindFreteList(opcoes);
+  }
+
+  function renderFreteOpts(cep, uf) {
+    var box = el("freteOpts"); if (!box) return;
+
+    if (subtotal() >= FRETE_GRATIS_ACIMA) {
+      freteAtual = 0;
+      box.innerHTML = '<div class="frete-gratis"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg> Frete grátis para compras acima de R$ 300!</div>';
+      renderSummary(); return;
+    }
+
+    /* Spinner enquanto calcula */
+    box.innerHTML = '<p style="color:var(--muted);font-size:.85rem">Calculando frete...</p>';
+
+    var apiBase = (window.RELUX_CONFIG && window.RELUX_CONFIG.apiBase) || "";
+    var qtd = items().reduce(function (s, it) { return s + it.qty; }, 0) || 1;
+
+    fetch(apiBase + "/api/frete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cep_destino: cep, qtd: qtd }),
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data.error || !data.opcoes || !data.opcoes.length) throw new Error(data.error || "sem opcoes");
+      showFreteOpts(data.opcoes);
+    })
+    .catch(function () {
+      /* Fallback: tabela estimada */
+      var t = FRETE_FALLBACK[uf] || FRETE_FALLBACK_PADRAO;
+      showFreteOpts([
+        { nome: "PAC",   empresa: "Correios", preco: t.pac.preco,   dias: t.pac.dias },
+        { nome: "SEDEX", empresa: "Correios", preco: t.sedex.preco, dias: t.sedex.dias },
+      ]);
+    });
+  }
+
+  function freteMethod() {
+    var r = document.querySelector('input[name="frete_tipo"]:checked');
+    if (!r) return "PAC";
+    var label = r.closest(".opt") && r.closest(".opt").querySelector(".o-title");
+    return label ? label.textContent.split(" — ")[0] : "PAC";
+  }
+
+  /* ---------- ViaCEP (autofill + frete) ---------- */
   function lookupCep() {
     var cep = onlyDigits((el("cep") || {}).value || "");
     if (cep.length !== 8) return;
@@ -78,8 +180,10 @@
         if (el("rua") && !el("rua").value) el("rua").value = d.logradouro || "";
         if (el("bairro") && !el("bairro").value) el("bairro").value = d.bairro || "";
         if (el("cidade")) el("cidade").value = d.localidade || "";
-        if (el("uf")) el("uf").value = (d.uf || "").toUpperCase();
+        var uf = (d.uf || "").toUpperCase();
+        if (el("uf")) el("uf").value = uf;
         var num = el("numero"); if (num) num.focus();
+        renderFreteOpts(cep, uf);
       }
     }).catch(function () {});
   }
@@ -123,15 +227,18 @@
     var sub = subtotal();
     var pm = payMethod();
     var disc = pm === "pix" ? sub * PIX_OFF : 0;
+    var frete = delivery() === "loja" ? 0 : freteAtual;
     var lines = items().map(function (it) { return "• " + it.qty + "x " + it.p.name + " (" + it.p.brand + ") — " + it.p.price; });
+    var tipoFrete = freteMethod();
     var entregaTxt = delivery() === "loja" ? "Retirar na loja"
-      : "Receber em casa\n" + val("rua") + ", " + val("numero") + (val("comp") ? " (" + val("comp") + ")" : "") + " - " + val("bairro") + ", " + val("cidade") + "/" + val("uf") + " - CEP " + val("cep");
+      : "Receber em casa (" + tipoFrete + ")\n" + val("rua") + ", " + val("numero") + (val("comp") ? " (" + val("comp") + ")" : "") + " - " + val("bairro") + ", " + val("cidade") + "/" + val("uf") + " - CEP " + val("cep");
     var pagTxt = pm === "pix" ? "Pix (5% à vista)" : pm === "cartao" ? "Cartão — " + (el("ccparc") ? el("ccparc").value + "x" : "1x") : "Boleto bancário";
-    return { num: orderNumber(), sub: sub, disc: disc, total: sub - disc, pm: pm, lines: lines, entregaTxt: entregaTxt, pagTxt: pagTxt };
+    return { num: orderNumber(), sub: sub, disc: disc, frete: frete, total: sub - disc + frete, pm: pm, lines: lines, entregaTxt: entregaTxt, pagTxt: pagTxt };
   }
   function orderMessage(o) {
     return "Olá! Novo pedido na Óticas Relux\nPedido " + o.num + "\n\n" + o.lines.join("\n") + "\n\n" +
-      "Subtotal: " + fmt(o.sub) + (o.disc ? "\nDesconto Pix: -" + fmt(o.disc) : "") + "\nFrete: Grátis\nTOTAL: " + fmt(o.total) + "\n\n" +
+      "Subtotal: " + fmt(o.sub) + (o.disc ? "\nDesconto Pix: -" + fmt(o.disc) : "") +
+      "\nFrete: " + (o.frete > 0 ? fmt(o.frete) : "Grátis") + "\nTOTAL: " + fmt(o.total) + "\n\n" +
       "Entrega: " + o.entregaTxt + "\nPagamento: " + o.pagTxt + "\n\n" +
       "Cliente: " + val("nome") + (val("cpf") ? " | CPF " + val("cpf") : "") + "\nContato: " + val("tel") + (val("email") ? " | " + val("email") : "");
   }
@@ -293,7 +400,9 @@
     // entrega
     el("deliveryOpts").addEventListener("change", function () {
       syncOptionUI("deliveryOpts");
-      el("addrFields").style.display = delivery() === "loja" ? "none" : "";
+      var isLoja = delivery() === "loja";
+      el("addrFields").style.display = isLoja ? "none" : "";
+      if (isLoja) { freteAtual = 0; var fo = el("freteOpts"); if (fo) fo.innerHTML = ""; renderSummary(); }
     });
 
     // pagamento
