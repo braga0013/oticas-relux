@@ -197,6 +197,17 @@ window.RELUX = window.RELUX || {};
     };
   }
 
+  /* produtos removidos a pedido da loja (não aparecem mesmo que estejam no banco) */
+  var EXCLUDED_KEYWORDS = [
+    "optogel", "century", "medisoft", "medisoft", "permeafluor",
+    "rgp-asfericas", "planex", "bifocal", "magic-top", "magic top",
+    "torica", "dupla-face", "dupla face", "optycolor", "familia-oxy", "family oxy"
+  ];
+  function isExcluded(r) {
+    var str = ((r.id || "") + " " + (r.name || "")).toLowerCase();
+    return EXCLUDED_KEYWORDS.some(function (kw) { return str.indexOf(kw) > -1; });
+  }
+
   var cfg = window.RELUX_CONFIG || {};
   var ready;
   if (!cfg.supabaseUrl || !cfg.supabaseKey) {
@@ -212,7 +223,7 @@ window.RELUX = window.RELUX || {};
         var have = {};
         window.RELUX_PRODUCTS.forEach(function (p) { have[p.id] = true; });
         (rows || []).forEach(function (r) {
-          if (!have[r.id]) window.RELUX_PRODUCTS.push(mapRow(r));
+          if (!have[r.id] && !isExcluded(r)) window.RELUX_PRODUCTS.push(mapRow(r));
         });
       })
       .catch(function () { /* offline/erro: mantém produtos locais */ });

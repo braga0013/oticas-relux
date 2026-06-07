@@ -131,10 +131,11 @@
   <!-- ░░░ Mobile menu overlay ░░░ -->
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <form class="js-search-form mobile-search" role="search"><input class="js-search-input" type="search" placeholder="Buscar..." aria-label="Buscar" /></form>
-    <a href="catalogo.html?cat=Óculos de Sol" data-link>Óculos de Sol</a>
     <a href="catalogo.html?cat=Óculos de Grau" data-link>Óculos de Grau</a>
-    <a href="catalogo.html?cat=Lentes de Contato" data-link>Lentes de Contato</a>
-    <a href="catalogo.html?cat=Linha Infantil" data-link>Linha Infantil</a>
+    <a href="catalogo.html?cat=Óculos de Sol" data-link>Óculos de Sol</a>
+    <a href="catalogo.html?cat=Óculos de Grau" data-link>Filtro Azul</a>
+    <a href="catalogo.html?cat=Óculos de Grau" data-link>Fotossensível</a>
+    <a href="catalogo.html?cat=Linha Infantil" data-link>Infantil</a>
     <a href="#contato" data-link>Contato</a>
     <a class="btn btn-primary" href="#contato" data-link>Agendar atendimento</a>
   </div>
@@ -233,13 +234,32 @@
         </header>
 
         <div class="bento reveal">
-          <a href="catalogo.html?cat=Óculos de Sol" class="cat-card cat-lg has-photo" data-tone="sol">
+
+          <!-- 1. Óculos de Grau (card grande - span 2 linhas) -->
+          <a href="catalogo.html?cat=Óculos de Grau" class="cat-card has-photo" data-tone="grau">
+            <div class="cat-inner">
+              <img class="cat-photo" src="assets/img/produtos/grau.png" alt="Óculos de grau" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
+              <span class="cat-scrim" aria-hidden="true"></span>
+              <span class="cat-tag">Lentes incluídas</span>
+              <span class="cat-arrow"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
+              <svg class="cat-glasses" viewBox="0 0 200 80" aria-hidden="true"><use href="#g-optic"/></svg>
+              <div class="cat-shine" aria-hidden="true"></div>
+              <div class="cat-foot">
+                <h3>Óculos de Grau</h3>
+                <p>Armações modernas com sua lente personalizada.</p>
+              </div>
+            </div>
+          </a>
+
+          <!-- 2. Óculos de Sol -->
+          <a href="catalogo.html?cat=Óculos de Sol" class="cat-card has-photo" data-tone="sol">
             <div class="cat-inner">
               <img class="cat-photo" src="assets/img/produtos/sol.png" alt="Óculos de sol" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
               <span class="cat-scrim" aria-hidden="true"></span>
               <span class="cat-tag">Mais vendido</span>
               <span class="cat-arrow"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-              <svg class="cat-glasses" viewBox="0 0 200 80" aria-hidden="true"><use href="#g-sun"/></svg>
+              <svg class="cat-glasses sm" viewBox="0 0 200 80" aria-hidden="true"><use href="#g-sun"/></svg>
+              <div class="cat-shine" aria-hidden="true"></div>
               <div class="cat-foot">
                 <h3>Óculos de Sol</h3>
                 <p>Proteção UV400 com design assinado.</p>
@@ -247,44 +267,51 @@
             </div>
           </a>
 
-          <a href="catalogo.html?cat=Óculos de Grau" class="cat-card has-photo" data-tone="grau">
+          <!-- 3. Filtro Azul -->
+          <a href="catalogo.html?cat=Óculos de Grau" class="cat-card has-photo" data-tone="filtro-azul">
             <div class="cat-inner">
-              <img class="cat-photo" src="assets/img/produtos/grau.png" alt="Óculos de grau" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
+              <img class="cat-photo" src="assets/img/produtos/grau.png" alt="Filtro de luz azul" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
               <span class="cat-scrim" aria-hidden="true"></span>
               <span class="cat-arrow"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
               <svg class="cat-glasses sm" viewBox="0 0 200 80" aria-hidden="true"><use href="#g-optic"/></svg>
+              <div class="cat-shine" aria-hidden="true"></div>
               <div class="cat-foot">
-                <h3>Óculos de Grau</h3>
-                <p>Armações leves e modernas.</p>
+                <h3>Filtro Azul</h3>
+                <p>Protege os olhos das telas digitais.</p>
               </div>
             </div>
           </a>
 
-          <a href="catalogo.html?cat=Lentes de Contato" class="cat-card has-photo" data-tone="lentes">
+          <!-- 4. Fotossensível -->
+          <a href="catalogo.html?cat=Óculos de Grau" class="cat-card has-photo" data-tone="fotossensivel">
             <div class="cat-inner">
-              <img class="cat-photo" src="assets/img/produtos/lente.png" alt="Lentes de contato" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
+              <img class="cat-photo" src="assets/img/produtos/grau.png" alt="Lentes fotossensíveis" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
               <span class="cat-scrim" aria-hidden="true"></span>
               <span class="cat-arrow"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
-              <svg class="cat-glasses sm" viewBox="0 0 200 80" aria-hidden="true"><use href="#g-lens"/></svg>
+              <svg class="cat-glasses sm" viewBox="0 0 200 80" aria-hidden="true"><use href="#g-optic"/></svg>
+              <div class="cat-shine" aria-hidden="true"></div>
               <div class="cat-foot">
-                <h3>Lentes de Contato</h3>
-                <p>Diárias, mensais e coloridas.</p>
+                <h3>Fotossensível</h3>
+                <p>Escurece no sol, clareia na sombra.</p>
               </div>
             </div>
           </a>
 
-          <a href="catalogo.html?cat=Linha Infantil" class="cat-card cat-wide has-photo" data-tone="infantil">
+          <!-- 5. Infantil -->
+          <a href="catalogo.html?cat=Linha Infantil" class="cat-card has-photo" data-tone="infantil">
             <div class="cat-inner">
               <img class="cat-photo" src="assets/img/produtos/infantil.png" alt="Óculos infantil" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
               <span class="cat-scrim" aria-hidden="true"></span>
               <span class="cat-arrow"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M7 17 17 7M9 7h8v8"/></svg></span>
               <svg class="cat-glasses sm" viewBox="0 0 200 80" aria-hidden="true"><use href="#g-round"/></svg>
+              <div class="cat-shine" aria-hidden="true"></div>
               <div class="cat-foot">
-                <h3>Linha Infantil</h3>
+                <h3>Infantil</h3>
                 <p>Resistentes, flexíveis e cheias de cor.</p>
               </div>
             </div>
           </a>
+
         </div>
       </div>
     </section>
