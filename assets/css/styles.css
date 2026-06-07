@@ -485,22 +485,44 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 .cat-card:not(.has-photo) .cat-glasses ellipse {
   animation: lens-darken 4.5s ease-in-out infinite;
 }
-/* animate photo overlay (for cards with photo) */
-.cat-card.has-photo .cat-inner::before {
-  content: '';
+/* animate ONLY the lens area (two ellipses = two lenses) */
+.cat-lens-overlay {
   position: absolute; inset: 0; z-index: 2; pointer-events: none;
   border-radius: inherit;
-  background: rgba(8, 10, 28, 0.55);
+  opacity: 0;
   animation: cat-overlay-dark 4.5s ease-in-out infinite;
+  /* aviator padrão (grau, filtro-azul, fotossensível) */
+  background:
+    radial-gradient(ellipse 18% 27% at 33% 37%, rgba(4, 8, 32, 0.92) 72%, transparent 100%),
+    radial-gradient(ellipse 18% 27% at 67% 37%, rgba(4, 8, 32, 0.92) 72%, transparent 100%);
 }
-/* reflection streak */
+/* card grande (Óculos de Grau) — photo ocupa mais espaço vertical */
+.bento > .cat-card:first-child .cat-lens-overlay {
+  background:
+    radial-gradient(ellipse 13% 18% at 33% 28%, rgba(4, 8, 32, 0.92) 72%, transparent 100%),
+    radial-gradient(ellipse 13% 18% at 67% 28%, rgba(4, 8, 32, 0.92) 72%, transparent 100%);
+}
+/* sol — aviador com lentes ligeiramente mais baixas e ovais */
+.cat-card[data-tone="sol"] .cat-lens-overlay {
+  background:
+    radial-gradient(ellipse 18% 30% at 33% 41%, rgba(4, 8, 32, 0.88) 68%, transparent 100%),
+    radial-gradient(ellipse 18% 30% at 67% 41%, rgba(4, 8, 32, 0.88) 68%, transparent 100%);
+}
+/* infantil — wayfarer: lentes mais largas e menos altas */
+.cat-card[data-tone="infantil"] .cat-lens-overlay {
+  background:
+    radial-gradient(ellipse 23% 16% at 32% 44%, rgba(4, 8, 32, 0.92) 72%, transparent 100%),
+    radial-gradient(ellipse 23% 16% at 68% 44%, rgba(4, 8, 32, 0.92) 72%, transparent 100%);
+}
+/* reflection streak — passa por cima das lentes escurecidas */
 .cat-shine {
-  position: absolute; top: 0; left: 0;
-  width: 45%; height: 100%;
-  background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,0.16) 50%, transparent 80%);
+  position: absolute; top: 10%; left: 0;
+  width: 55%; height: 55%;
+  background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,0.22) 50%, transparent 80%);
   animation: cat-shine 4.5s ease-in-out infinite;
-  pointer-events: none; z-index: 5;
-  border-radius: inherit;
+  pointer-events: none; z-index: 3;
+  border-radius: 50%;
+  transform-origin: left center;
 }
 
 /* ============================================================
