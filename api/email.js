@@ -144,7 +144,7 @@ module.exports = async function handler(req, res) {
         Authorization: "Bearer " + KEY,
       },
       body: JSON.stringify({
-        from: "Óticas Relux <pedidos@oticasrelux.com.br>",
+        from: "Óticas Relux <onboarding@resend.dev>",
         to: [storeEmail],
         subject,
         html,
