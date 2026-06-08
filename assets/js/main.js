@@ -17,14 +17,20 @@
     if (saved === "dark" || saved === "light") applyTheme(saved);
   } catch (e) { /* storage blocked — keep default light */ }
 
-  var toggle = document.getElementById("themeToggle");
-  if (toggle) {
-    toggle.addEventListener("click", function () {
+  function bindThemeBtn(id) {
+    var btn = document.getElementById(id);
+    if (!btn) return;
+    btn.addEventListener("click", function () {
       var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
       applyTheme(next);
       try { localStorage.setItem(STORE, next); } catch (e) {}
+      // atualiza label no botão do menu mobile
+      var lbl = document.querySelector(".mm-theme-label");
+      if (lbl) lbl.textContent = next === "dark" ? "Tema claro" : "Tema escuro";
     });
   }
+  bindThemeBtn("themeToggle");
+  bindThemeBtn("themeToggleMobile");
 
   /* ---------- Nav: shadow on scroll ---------- */
   var navWrap = document.getElementById("navWrap");

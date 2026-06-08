@@ -206,6 +206,11 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 .mobile-menu.open a:nth-child(4) { transition-delay: 0.24s; }
 .mobile-menu.open a:nth-child(5) { transition-delay: 0.30s; }
 .mobile-menu .btn { font-size: 1rem; margin-top: 14px; transition-delay: 0.36s; }
+.mm-actions { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 8px; opacity: 0; transform: translateY(14px); transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-drawer); transition-delay: 0.30s; }
+.mobile-menu.open .mm-actions { opacity: 1; transform: translateY(0); }
+.mm-theme { position: static; width: auto; height: auto; padding: 10px 18px; border-radius: 999px; display: inline-flex; align-items: center; gap: 10px; font-family: "Plus Jakarta Sans", sans-serif; font-size: 0.95rem; font-weight: 500; overflow: visible; }
+.mm-theme svg { position: static; }
+.mm-theme-label { font-family: inherit; font-size: 0.95rem; }
 
 /* ============================================================
    HERO
@@ -561,6 +566,25 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
   .floating-card { font-size: 0.72rem; }
   .fc-1 { left: 0; } .fc-2 { right: 0; }
   .hero-stats { gap: 16px; }
+
+  /* ---- nav mobile: esconde favoritos e tema, mantém conta + carrinho + hamburger ---- */
+  #favBtn, .theme-toggle { display: none; }
+  .nav-actions { gap: 6px; }
+  .nav { padding: 8px 10px 8px 14px; gap: 10px; }
+
+  /* ---- toast: mais largo e sem pill em mobile ---- */
+  .toast-wrap { left: 16px; right: 16px; transform: none; align-items: stretch; }
+  .toast {
+    border-radius: 18px;
+    padding: 14px 14px 14px 18px;
+    font-size: 0.88rem;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+    align-items: flex-start;
+  }
+  .toast-action { white-space: nowrap; align-self: center; flex-shrink: 0; }
 }
 @media (max-width: 440px) {
   .products { grid-template-columns: 1fr; }
@@ -720,9 +744,9 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 .account-grid { max-width: 760px; margin: 0 auto; display: grid; gap: 18px; }
 .acct-hero { display: flex; align-items: center; gap: 18px; padding: 26px; background: var(--surface); border: 1px solid var(--hair); border-radius: var(--r-lg); box-shadow: var(--inset-hi); }
 .acct-avatar { flex: none; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 1.6rem; color: var(--on-gold); background: linear-gradient(150deg, var(--gold-bright), var(--gold-deep)); }
-.acct-hero > div { flex: 1; }
+.acct-hero > div { flex: 1; min-width: 0; }
 .acct-greeting { font-size: 1.5rem; margin: 6px 0 2px; }
-.acct-email { color: var(--muted); font-size: 0.9rem; }
+.acct-email { color: var(--muted); font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; min-width: 0; }
 .acct-card { background: var(--surface); border: 1px solid var(--hair); border-radius: var(--r-lg); padding: 26px; box-shadow: var(--inset-hi); }
 .acct-card h2 { font-size: 1.12rem; margin-bottom: 18px; }
 .acct-saved { display: none; margin-left: 12px; color: #10b981; font-size: 0.85rem; font-weight: 600; }
