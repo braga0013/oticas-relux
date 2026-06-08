@@ -130,7 +130,7 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
    NAV
    ============================================================ */
 .nav-wrap {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 55;
   display: flex; justify-content: center;
   padding: 18px 16px;
   transition: padding 0.4s var(--ease-out);
