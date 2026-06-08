@@ -964,3 +964,62 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
   .lens-uploads { grid-template-columns: 1fr; }
   .lens-modal-card { max-height: 96vh; }
 }
+
+/* ============================================================
+   CORREÇÕES MOBILE — layout responsivo
+   ============================================================ */
+
+/* --- bento: cards menores ficam mais legíveis em telas ≤480px --- */
+@media (max-width: 480px) {
+  .bento { grid-auto-rows: 180px; gap: 10px; }
+  .bento > .cat-card:first-child { grid-auto-rows: auto; }
+  .cat-foot h3 { font-size: 1.1rem; }
+  .bento > .cat-card:first-child .cat-foot h3 { font-size: 1.4rem; }
+  .cat-foot p { font-size: 0.8rem; margin: 4px 0 0; }
+  .cat-inner { padding: 14px; }
+  /* foto não sangra além do card */
+  .cat-photo { top: 6%; bottom: 36%; left: 5%; right: 5%; }
+  .bento > .cat-card:first-child .cat-photo { top: 8%; bottom: 26%; }
+}
+
+/* --- produto: specs e CTA não sangram sob o botão WA --- */
+@media (max-width: 760px) {
+  .pdp-specs { padding-right: 0; }
+  .pdp-specs table { table-layout: fixed; width: 100%; }
+  .pdp-specs td:first-child { width: 45%; }
+  .pdp-specs td:last-child { width: 55%; text-align: right; word-break: break-word; padding-right: 70px; }
+  /* afasta conteúdo do botão flutuante do WA */
+  .pdp-body { padding-bottom: 88px; }
+}
+
+/* --- hero: floating cards não saem do viewport --- */
+@media (max-width: 480px) {
+  .fc-1 { left: -2px !important; }
+  .fc-2 { right: -2px !important; }
+  .floating-card { font-size: 0.68rem; padding: 8px 12px; gap: 8px; }
+}
+
+/* --- feature grid: espaçamento correto em 1 coluna --- */
+@media (max-width: 760px) {
+  .feature-grid { gap: 12px; }
+  .feature { padding: 20px; }
+  .feature-ico { width: 44px; height: 44px; margin-bottom: 14px; }
+}
+
+/* --- checkout: campos não saem do viewport em telas muito pequenas --- */
+@media (max-width: 400px) {
+  .co-form, .co-summary { padding: 0; }
+  .co-card { padding: 18px 14px; }
+  .checkout { padding-top: 100px; }
+}
+
+/* --- evita scroll horizontal global em qualquer página --- */
+html { overflow-x: hidden; }
+
+/* --- catalogo: chips de filtro sem overflow --- */
+@media (max-width: 560px) {
+  .cat-chips { gap: 6px; }
+  .cat-chip { font-size: 0.8rem; padding: 7px 12px; }
+  .cat-toolbar { gap: 10px; }
+  .cat-sort select { font-size: 0.82rem; padding: 9px 10px; }
+}
