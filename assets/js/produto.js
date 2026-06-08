@@ -9,7 +9,7 @@
   function set(id, txt) { var e = el(id); if (e) e.textContent = txt; }
 
   function run() {
-  var WA = (window.RELUX_CONFIG && window.RELUX_CONFIG.whatsapp) || "5500000000000";
+  var WA = (window.RELUX_CONFIG && window.RELUX_CONFIG.whatsapp) || "5551995963008";
   var list = window.RELUX_PRODUCTS || [];
   var id = qs("id");
   var p = (window.RELUX && window.RELUX.findProduct(id)) || list[0];

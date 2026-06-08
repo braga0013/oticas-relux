@@ -8,6 +8,14 @@
 
   function showError(msg) { var e = el("authError"); if (!e) return; e.textContent = msg || ""; e.classList.toggle("show", !!msg); }
 
+  /* destino após login (ex.: ?next=checkout.html) — só caminhos internos */
+  function nextUrl() {
+    var m = /[?&]next=([^&]+)/.exec(location.search);
+    var nx = m ? decodeURIComponent(m[1]) : "";
+    return /^[\w.\-]+\.html(\?[\w%=&.\-]*)?$/.test(nx) ? nx : "";
+  }
+  function goNext() { var nx = nextUrl(); if (nx) { location.href = nx; return true; } return false; }
+
   function maskTel(input) {
     if (!input) return;
     input.addEventListener("input", function () {
@@ -56,7 +64,12 @@
 
   function init() {
     var cur = A && A.current();
-    if (cur) showAccount(cur); else showAuth();
+    if (cur) { if (goNext()) return; showAccount(cur); } else showAuth();
+
+    // contexto: veio do checkout precisando logar
+    if (nextUrl() && el("authSubtitle")) {
+      el("authSubtitle").textContent = "Entre ou crie sua conta para finalizar a compra com seus dados corretos.";
+    }
 
     // tabs
     el("tabLogin").addEventListener("click", function () { swap("login"); });
@@ -78,6 +91,7 @@
       e.preventDefault();
       var r = A.login(v("lEmail"), v("lPass"));
       if (!r.ok) return showError(r.error);
+      if (goNext()) return;
       showAccount(r.user);
     });
     // cadastro
@@ -85,6 +99,7 @@
       e.preventDefault();
       var r = A.register({ name: v("rName"), email: v("rEmail"), phone: v("rPhone"), pass: v("rPass") });
       if (!r.ok) return showError(r.error);
+      if (goNext()) return;
       showAccount(r.user);
     });
     // perfil

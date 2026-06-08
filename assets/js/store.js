@@ -3,7 +3,7 @@
   "use strict";
   var CART_KEY = "relux-cart";
   var FAV_KEY  = "relux-fav";
-  var WA = (window.RELUX_CONFIG && window.RELUX_CONFIG.whatsapp) || "5500000000000";
+  var WA = (window.RELUX_CONFIG && window.RELUX_CONFIG.whatsapp) || "5551995963008";
   window.RELUX = window.RELUX || {};
 
   /* ---------- preços das lentes ---------- */
@@ -251,6 +251,17 @@
     wrap.querySelectorAll("[data-close]").forEach(function (b) { b.addEventListener("click", closeDrawers); });
     var cl = document.getElementById("cartClear");
     if (cl) cl.addEventListener("click", clearCart);
+
+    /* Exige login antes de ir para o checkout (mantém dados do cliente corretos) */
+    var co = document.getElementById("cartCheckout");
+    if (co) co.addEventListener("click", function (e) {
+      var u = window.RELUX_AUTH && window.RELUX_AUTH.current();
+      if (!u) {
+        e.preventDefault();
+        toast("Entre na sua conta para finalizar a compra");
+        location.href = "conta.html?next=checkout.html";
+      }
+    });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") { closeDrawers(); hideLensModal(); }
     });

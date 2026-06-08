@@ -5,7 +5,7 @@
        Preenchido = pagamento real (Pix/cartão/boleto) via /api (precisa deploy).
    - apiBase: deixe "" se a API estiver na mesma URL do site (Vercel). */
 window.RELUX_CONFIG = {
-  whatsapp: "5500000000000",
+  whatsapp: "5551995963008",
   mpPublicKey: "",
   apiBase: "",
   /* Supabase — catálogo dinâmico (as lentes vêm de lá).

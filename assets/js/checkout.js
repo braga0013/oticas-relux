@@ -2,7 +2,7 @@
 (function () {
   "use strict";
   var R = window.RELUX || {};
-  var WA = (window.RELUX_CONFIG && window.RELUX_CONFIG.whatsapp) || "5500000000000";
+  var WA = (window.RELUX_CONFIG && window.RELUX_CONFIG.whatsapp) || "5551995963008";
   var PIX_OFF = 0.05; // 5% no Pix
   var cardInfo = { payment_method_id: null, issuer_id: null }; // detectado pelo BIN
 
