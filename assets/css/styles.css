@@ -191,12 +191,17 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 
 /* mobile menu overlay */
 .mobile-menu {
-  position: fixed; inset: 0; z-index: 35;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  position: fixed; inset: 0; z-index: 50;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 110px 24px 40px; overflow-y: auto; gap: 0;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(26px); -webkit-backdrop-filter: blur(26px);
   opacity: 0; pointer-events: none; transition: opacity 0.4s var(--ease-out);
 }
+/* busca no topo do menu */
+.mobile-menu .mobile-search { margin-bottom: 20px; width: 100%; }
+/* links com menos espaço vertical */
+.mobile-menu a { padding: 10px 12px; }
 .mobile-menu.open { opacity: 1; pointer-events: auto; }
 .mobile-menu a { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.6rem; font-weight: 600; padding: 12px; color: var(--ink); opacity: 0; transform: translateY(14px); transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-drawer); }
 .mobile-menu.open a { opacity: 1; transform: translateY(0); }

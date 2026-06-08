@@ -51,6 +51,9 @@
     burger.setAttribute("aria-expanded", String(open));
     menu.setAttribute("aria-hidden", String(!open));
     document.body.style.overflow = open ? "hidden" : "";
+    // esconde botão flutuante do WhatsApp quando menu está aberto
+    var waBtn = document.querySelector(".wa-float");
+    if (waBtn) waBtn.style.display = open ? "none" : "";
   }
   if (burger) burger.addEventListener("click", function () { setMenu(!menu.classList.contains("open")); });
   if (menu) {
