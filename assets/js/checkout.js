@@ -250,8 +250,16 @@
   function setProcessing(on, label) { var b = el("coSubmit"); if (!b) return; b.disabled = on; b.style.opacity = on ? ".6" : ""; b.textContent = on ? (label || "Processando...") : "Finalizar pedido"; }
   function showError(msg) { setProcessing(false); alert(msg || "Não foi possível processar o pagamento. Tente novamente."); }
 
+  /* ---------- login obrigatório ---------- */
+  function requireLogin() {
+    var u = window.RELUX_AUTH && window.RELUX_AUTH.current();
+    if (!u) { location.replace("conta.html?next=checkout.html"); return false; }
+    return true;
+  }
+
   /* ---------- finalizar: roteia real (Mercado Pago) x WhatsApp ---------- */
   function finalize() {
+    if (!requireLogin()) return;
     if (!items().length) return;
     if (!validate()) return;
     var o = buildOrder();
@@ -267,6 +275,7 @@
     else pix.hidden = true;
     el("csMsg").textContent = "Confirme seu pedido pelo WhatsApp — a loja finaliza o pagamento e combina a entrega.";
     saveOrder(o, "pendente");
+    sendOrderEmail(o, "pendente");
     openSuccess();
     if (R.clearCart) R.clearCart();
   }
@@ -291,6 +300,7 @@
           el("csMsg").textContent = "Pague o boleto para confirmar (compensa em até 2 dias úteis).";
         }
         saveOrder(o, "pendente");
+        sendOrderEmail(o, "pendente");
         openSuccess();
         if (R.clearCart) R.clearCart();
       })
@@ -337,7 +347,8 @@
       if (res.status === "approved") { h.textContent = "Pagamento aprovado! 🎉"; el("csMsg").textContent = "Compra confirmada. Em breve falamos sobre a entrega."; }
       else if (res.status === "in_process" || res.status === "pending") { h.textContent = "Pagamento em análise"; el("csMsg").textContent = "Seu pagamento está em processamento. Avisaremos quando aprovar."; }
       else { h.textContent = "Pagamento recusado"; el("csMsg").textContent = "Não aprovado (" + (res.status_detail || "tente outro cartão") + ")."; }
-      if (res.status !== "rejected") saveOrder(o, res.status === "approved" ? "aprovado" : "pendente");
+      var orderStatus = res.status === "approved" ? "aprovado" : "pendente";
+      if (res.status !== "rejected") { saveOrder(o, orderStatus); sendOrderEmail(o, orderStatus); }
       openSuccess();
       if (res.status === "approved" && R.clearCart) R.clearCart();
     }).catch(function (err) {
@@ -360,6 +371,40 @@
     if (el("cpf") && !el("cpf").value) el("cpf").value = u.cpf || "";
   }
 
+  function sendOrderEmail(o, status) {
+    try {
+      var its = items().map(function (it) {
+        return { name: it.p.name + (it.p.brand ? " — " + it.p.brand : ""), qty: it.qty, price: it.p.price };
+      });
+      var pm = o.pm;
+      var parc = (el("ccparc") && parseInt(el("ccparc").value, 10)) || 1;
+      var payload = {
+        num: o.num,
+        items: its,
+        subtotal: o.sub,
+        discount: o.disc,
+        shipping: o.frete,
+        shippingMethod: freteMethod(),
+        total: o.total,
+        payMethod: pm,
+        installments: parc,
+        delivery: delivery(),
+        address: {
+          rua: val("rua"), numero: val("numero"), comp: val("comp"),
+          bairro: val("bairro"), cidade: val("cidade"), uf: val("uf"), cep: val("cep")
+        },
+        customer: { name: val("nome"), phone: val("tel"), email: val("email"), cpf: val("cpf") },
+        status: status || "pendente"
+      };
+      var apiBase = (window.RELUX_CONFIG && window.RELUX_CONFIG.apiBase) || "";
+      fetch(apiBase + "/api/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(function () {});
+    } catch (e) {}
+  }
+
   function saveOrder(o, status) {
     var u = window.RELUX_AUTH && window.RELUX_AUTH.current();
     var rec = { num: o.num, total: fmt(o.total), qtd: items().reduce(function (s, it) { return s + it.qty; }, 0), date: new Date().toLocaleDateString("pt-BR"), status: status || "pendente", email: u ? u.email : "guest" };
@@ -368,6 +413,7 @@
   }
 
   function init() {
+    if (!requireLogin()) return;
     renderSummary();
     fillInstallments();
     prefillFromAccount();
