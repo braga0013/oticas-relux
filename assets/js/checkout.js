@@ -4,8 +4,6 @@
   var R = window.RELUX || {};
   var WA = (window.RELUX_CONFIG && window.RELUX_CONFIG.whatsapp) || "5551995963008";
   var PIX_OFF = 0.05; // 5% no Pix
-  var cardInfo = { payment_method_id: null, issuer_id: null }; // detectado pelo BIN
-
   function el(id) { return document.getElementById(id); }
   function parseBRL(s) { return R.parseBRL ? R.parseBRL(s) : parseFloat(String(s).replace(/[^\d,]/g, "").replace(",", ".")) || 0; }
   function fmt(n) { return R.fmtBRL ? R.fmtBRL(n) : "R$ " + n.toFixed(2); }
@@ -243,8 +241,12 @@
       "Cliente: " + val("nome") + (val("cpf") ? " | CPF " + val("cpf") : "") + "\nContato: " + val("tel") + (val("email") ? " | " + val("email") : "");
   }
   function payerObj() {
-    var nome = val("nome").split(" ");
-    return { email: val("email") || "cliente@oticasrelux.com.br", first_name: nome[0], last_name: nome.slice(1).join(" "), cpf: onlyDigits(val("cpf")) };
+    return {
+      name: val("nome"),
+      email: val("email") || "cliente@oticasrelux.com.br",
+      phone: onlyDigits(val("tel")),
+      cpf: onlyDigits(val("cpf")),
+    };
   }
   function openSuccess() { el("coSuccess").classList.add("open"); el("coSuccess").setAttribute("aria-hidden", "false"); document.body.style.overflow = "hidden"; }
   function setProcessing(on, label) { var b = el("coSubmit"); if (!b) return; b.disabled = on; b.style.opacity = on ? ".6" : ""; b.textContent = on ? (label || "Processando...") : "Finalizar pedido"; }
@@ -290,9 +292,22 @@
         el("csWhats").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(orderMessage(o));
         var pix = el("csPix"); pix.hidden = false;
         if (o.pm === "pix") {
+          var pixCode = res.qr_code || "";
           pix.innerHTML = (res.qr_code_base64 ? '<img src="data:image/png;base64,' + res.qr_code_base64 + '" alt="QR Code Pix" style="width:180px;height:180px;margin:0 auto 12px;display:block">' : "") +
-            "<b>Pix copia e cola</b><br>" + (res.qr_code || "") + "<br><br><b>Total: " + fmt(o.total) + "</b>";
-          el("csMsg").textContent = "Escaneie o QR ou copie o código no app do seu banco. A confirmação aparece aqui automaticamente.";
+            "<b>Pix copia e cola</b>" +
+            '<div style="word-break:break-all;font-size:.72rem;background:rgba(0,0,0,.06);border-radius:8px;padding:8px 12px;margin:8px 0 10px">' + pixCode + "</div>" +
+            '<button id="pixCopyBtn" type="button" style="background:var(--gold,#c8920a);color:#000;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.85rem;margin-bottom:10px">Copiar código Pix</button>' +
+            "<br><b>Total: " + fmt(o.total) + "</b>";
+          var copyBtn = el("pixCopyBtn");
+          if (copyBtn) {
+            copyBtn.addEventListener("click", function () {
+              navigator.clipboard.writeText(pixCode).then(function () {
+                copyBtn.textContent = "Copiado! ✓";
+                copyBtn.style.background = "#22c55e";
+              }, function () {});
+            });
+          }
+          el("csMsg").textContent = "Escaneie o QR ou copie o código Pix no app do seu banco. A confirmação aparece aqui automaticamente.";
           document.querySelector(".cs-card h2").textContent = "Quase lá — pague o Pix";
           if (res.id) pollStatus(res.id);
         } else {
@@ -328,31 +343,44 @@
   function payCard(o) {
     setProcessing(true, "Processando pagamento...");
     var exp = val("ccval").split("/");
-    window.RELUX_PAY.tokenizeCard({
-      cardNumber: onlyDigits(val("ccnum")), cardholderName: val("ccname"),
-      month: exp[0], year: (exp[1] && exp[1].length === 2 ? "20" + exp[1] : exp[1]),
-      cvv: val("cccvv"), cpf: onlyDigits(val("cpf")),
-    }).then(function (tk) {
-      return window.RELUX_PAY.pay({
-        method: "card", amount: o.total, description: "Pedido " + o.num + " — Óticas Relux",
-        token: tk.id, installments: (el("ccparc") ? parseInt(el("ccparc").value, 10) : 1),
-        payment_method_id: cardInfo.payment_method_id, issuer_id: cardInfo.issuer_id, payer: payerObj(),
-      });
+    var payer = payerObj();
+    payer.cep = onlyDigits(val("cep"));
+    payer.addressNumber = val("numero");
+    window.RELUX_PAY.pay({
+      method: "card",
+      amount: o.total,
+      description: "Pedido " + o.num + " — Óticas Relux",
+      installments: el("ccparc") ? parseInt(el("ccparc").value, 10) : 1,
+      payer: payer,
+      creditCard: {
+        holderName: val("ccname"),
+        number: onlyDigits(val("ccnum")),
+        expiryMonth: exp[0],
+        expiryYear: exp[1] || "",
+        ccv: val("cccvv"),
+      },
     }).then(function (res) {
       setProcessing(false);
       el("csOrder").textContent = "Nº " + o.num;
       el("csWhats").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(orderMessage(o));
       el("csPix").hidden = true;
       var h = document.querySelector(".cs-card h2");
-      if (res.status === "approved") { h.textContent = "Pagamento aprovado! 🎉"; el("csMsg").textContent = "Compra confirmada. Em breve falamos sobre a entrega."; }
-      else if (res.status === "in_process" || res.status === "pending") { h.textContent = "Pagamento em análise"; el("csMsg").textContent = "Seu pagamento está em processamento. Avisaremos quando aprovar."; }
-      else { h.textContent = "Pagamento recusado"; el("csMsg").textContent = "Não aprovado (" + (res.status_detail || "tente outro cartão") + ")."; }
+      if (res.status === "approved") {
+        h.textContent = "Pagamento aprovado! 🎉";
+        el("csMsg").textContent = "Compra confirmada. Em breve falamos sobre a entrega.";
+      } else if (res.status === "pending") {
+        h.textContent = "Pagamento em análise";
+        el("csMsg").textContent = "Seu pagamento está em processamento. Avisaremos quando aprovar.";
+      } else {
+        h.textContent = "Pagamento recusado";
+        el("csMsg").textContent = "Não aprovado — verifique os dados ou tente outro cartão.";
+      }
       var orderStatus = res.status === "approved" ? "aprovado" : "pendente";
       if (res.status !== "rejected") { saveOrder(o, orderStatus); sendOrderEmail(o, orderStatus); }
       openSuccess();
       if (res.status === "approved" && R.clearCart) R.clearCart();
     }).catch(function (err) {
-      showError((err && (err.error || (err.cause && err.cause[0] && err.cause[0].description))) || "Não foi possível validar o cartão. Confira os dados.");
+      showError((err && err.error) || "Não foi possível processar o pagamento. Confira os dados e tente novamente.");
     });
   }
 
@@ -423,25 +451,6 @@
     mask(el("ccnum"), mCard); mask(el("ccval"), mVal); mask(el("cccvv"), mCvv);
     if (el("uf")) el("uf").addEventListener("input", function () { el("uf").value = el("uf").value.replace(/[^a-zA-Z]/g, "").toUpperCase().slice(0, 2); });
     if (el("cep")) el("cep").addEventListener("blur", lookupCep);
-
-    // cartão: detecta bandeira + parcelas reais pelo BIN (só no modo Mercado Pago)
-    var ccnum = el("ccnum");
-    if (ccnum && window.RELUX_PAY && window.RELUX_PAY.enabled) {
-      ccnum.addEventListener("input", function () {
-        var bin = onlyDigits(ccnum.value).slice(0, 6);
-        if (bin.length < 6) return;
-        window.RELUX_PAY.detectCard(bin, subtotal()).then(function (info) {
-          if (!info) return;
-          cardInfo.payment_method_id = info.payment_method_id;
-          cardInfo.issuer_id = info.issuer_id;
-          if (info.installments && info.installments.length) {
-            el("ccparc").innerHTML = info.installments.map(function (pc) {
-              return '<option value="' + pc.installments + '">' + pc.recommended_message + "</option>";
-            }).join("");
-          }
-        });
-      });
-    }
 
     // entrega
     el("deliveryOpts").addEventListener("change", function () {
