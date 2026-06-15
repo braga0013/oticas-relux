@@ -3,220 +3,344 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gerenciar Produtos — Óticas Relux</title>
+  <title>Admin Produtos — Óticas Relux</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="assets/css/styles.css" />
   <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
   <style>
-    .adm-wrap { padding: 32px 0 80px; min-height: 100vh; }
-    .adm-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 12px; }
-    .adm-section { background: var(--bg-2); border: 1px solid var(--hair); border-radius: var(--r-md); padding: 24px; margin-bottom: 24px; }
-    .adm-section h3 { font-size: 1rem; margin-bottom: 16px; }
-    .adm-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-    .adm-table th { text-align: left; padding: 8px 10px; color: var(--muted); font-weight: 600; font-size: .75rem; text-transform: uppercase; border-bottom: 1px solid var(--hair); }
-    .adm-table td { padding: 10px 10px; border-bottom: 1px solid var(--hair-soft); vertical-align: middle; }
-    .btn-rm { background: rgba(239,68,68,.1); color: #ef4444; border: 1px solid rgba(239,68,68,.2); border-radius: 999px; padding: 3px 12px; font-size: .78rem; cursor: pointer; font-weight: 600; }
-    .btn-rm:hover { background: rgba(239,68,68,.2); }
+    /* ── Layout ── */
+    body { min-height: 100vh; }
+    .adm { display: none; flex-direction: column; min-height: 100vh; }
+    .adm.visible { display: flex; }
+    .adm-top { position: sticky; top: 0; z-index: 80; background: var(--bg); border-bottom: 1px solid var(--hair); padding: 0 24px; height: 58px; display: flex; align-items: center; gap: 16px; }
+    .adm-top h1 { font-size: 1rem; font-weight: 700; flex: 1; }
+    .adm-body { flex: 1; padding: 24px; max-width: 1200px; margin: 0 auto; width: 100%; }
 
-    /* Formulário */
-    .adm-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
-    .adm-field { display: flex; flex-direction: column; gap: 5px; }
-    .adm-field label { font-size: .78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-    .adm-field input, .adm-field select, .adm-field textarea {
-      background: var(--bg); border: 1px solid var(--hair); border-radius: var(--r-sm);
-      color: var(--ink); font-family: inherit; font-size: .9rem; padding: 9px 12px;
+    /* ── Login ── */
+    .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+    .login-card { background: var(--bg-2); border: 1px solid var(--hair); border-radius: var(--r-lg); padding: 40px 32px; width: 100%; max-width: 380px; text-align: center; }
+    .login-card h2 { margin-bottom: 6px; font-size: 1.3rem; }
+    .login-card p { color: var(--muted); font-size: .88rem; margin-bottom: 28px; }
+    .login-card input { width: 100%; padding: 11px 14px; border: 1px solid var(--hair); border-radius: var(--r-sm); background: var(--bg); color: var(--ink); font-family: inherit; font-size: .95rem; margin-bottom: 12px; box-sizing: border-box; }
+    .login-card input:focus { outline: 2px solid var(--gold); }
+    .login-err { color: #ef4444; font-size: .85rem; margin-bottom: 10px; display: none; }
+
+    /* ── Stats bar ── */
+    .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+    .stat { background: var(--bg-2); border: 1px solid var(--hair); border-radius: var(--r-md); padding: 12px 18px; min-width: 110px; }
+    .stat-n { font-size: 1.5rem; font-weight: 700; line-height: 1; }
+    .stat-l { font-size: .75rem; color: var(--muted); font-weight: 600; text-transform: uppercase; margin-top: 3px; }
+
+    /* ── Toolbar ── */
+    .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 16px; }
+    .toolbar input[type=search] { flex: 1; min-width: 180px; padding: 9px 14px; border: 1px solid var(--hair); border-radius: var(--r-sm); background: var(--bg); color: var(--ink); font-family: inherit; font-size: .9rem; }
+    .toolbar input[type=search]:focus { outline: 2px solid var(--gold); }
+    .toolbar select { padding: 9px 12px; border: 1px solid var(--hair); border-radius: var(--r-sm); background: var(--bg); color: var(--ink); font-family: inherit; font-size: .88rem; }
+
+    /* ── Tabela ── */
+    .tbl-wrap { overflow-x: auto; background: var(--bg-2); border: 1px solid var(--hair); border-radius: var(--r-md); }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    thead th { padding: 10px 12px; text-align: left; color: var(--muted); font-weight: 600; font-size: .75rem; text-transform: uppercase; border-bottom: 1px solid var(--hair); white-space: nowrap; }
+    tbody td { padding: 10px 12px; border-bottom: 1px solid var(--hair-soft); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--surface-2); }
+    .thumb { width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid var(--hair); }
+    .thumb-ph { width: 44px; height: 44px; border-radius: 6px; background: var(--surface-2); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: .7rem; border: 1px solid var(--hair); }
+    .badge-cat { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .72rem; font-weight: 600; background: var(--surface-2); color: var(--muted); }
+    .toggle-wrap { display: flex; align-items: center; gap: 6px; }
+    .toggle { position: relative; width: 36px; height: 20px; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-slider { position: absolute; inset: 0; background: #d1d5db; border-radius: 999px; cursor: pointer; transition: .2s; }
+    .toggle-slider::before { content: ""; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+    .toggle input:checked + .toggle-slider { background: var(--gold); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+    .row-actions { display: flex; gap: 6px; }
+    .btn-edit { background: var(--bg); border: 1px solid var(--hair); color: var(--ink); border-radius: var(--r-sm); padding: 4px 12px; font-size: .78rem; font-weight: 600; cursor: pointer; }
+    .btn-edit:hover { border-color: var(--gold); }
+    .btn-del { background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2); color: #ef4444; border-radius: var(--r-sm); padding: 4px 10px; font-size: .78rem; font-weight: 600; cursor: pointer; }
+    .btn-del:hover { background: rgba(239,68,68,.18); }
+
+    /* ── Drawer (formulário) ── */
+    .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    .drawer-overlay.open { opacity: 1; pointer-events: all; }
+    .drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(580px, 100%); background: var(--bg); border-left: 1px solid var(--hair); z-index: 201; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .28s cubic-bezier(.4,0,.2,1); }
+    .drawer.open { transform: none; }
+    .drawer-head { padding: 18px 20px; border-bottom: 1px solid var(--hair); display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+    .drawer-head h2 { font-size: 1rem; flex: 1; }
+    .drawer-body { flex: 1; overflow-y: auto; padding: 20px; }
+    .drawer-foot { padding: 14px 20px; border-top: 1px solid var(--hair); display: flex; gap: 10px; flex-shrink: 0; }
+
+    /* ── Formulário ── */
+    .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .frow.one { grid-template-columns: 1fr; }
+    .frow.three { grid-template-columns: 1fr 1fr 1fr; }
+    .fg { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .fg label { font-size: .75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+    .fg input, .fg select, .fg textarea { padding: 9px 12px; border: 1px solid var(--hair); border-radius: var(--r-sm); background: var(--bg); color: var(--ink); font-family: inherit; font-size: .9rem; width: 100%; box-sizing: border-box; }
+    .fg input:focus, .fg select:focus, .fg textarea:focus { outline: 2px solid var(--gold); }
+    .fg textarea { min-height: 72px; resize: vertical; }
+    .fsec { font-size: .8rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: .06em; padding: 8px 0 6px; border-top: 1px solid var(--hair); margin-top: 4px; margin-bottom: 2px; }
+
+    /* ── Upload de imagem ── */
+    .img-upload-box { border: 2px dashed var(--hair); border-radius: var(--r-md); padding: 16px; text-align: center; cursor: pointer; transition: border-color .2s; position: relative; }
+    .img-upload-box:hover { border-color: var(--gold); }
+    .img-upload-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .img-preview { width: 100%; max-height: 160px; object-fit: contain; border-radius: 6px; margin-bottom: 8px; display: none; }
+    .img-upload-hint { font-size: .8rem; color: var(--muted); }
+    .upload-prog { font-size: .8rem; color: var(--gold); font-weight: 600; display: none; }
+
+    /* ── Galeria ── */
+    .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 8px; margin-bottom: 10px; }
+    .gallery-item { position: relative; border-radius: 6px; overflow: hidden; border: 1px solid var(--hair); aspect-ratio: 1; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-rm { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,.6); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+    .gallery-add-box { border: 1px dashed var(--hair); border-radius: 6px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; font-size: 1.4rem; color: var(--muted); }
+    .gallery-add-box:hover { border-color: var(--gold); color: var(--gold); }
+    .gallery-add-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+    /* ── Tags (cores / variações) ── */
+    .tags-wrap { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 8px; border: 1px solid var(--hair); border-radius: var(--r-sm); min-height: 42px; cursor: text; }
+    .tag { background: var(--surface-2); border-radius: 999px; padding: 3px 10px 3px 12px; font-size: .82rem; display: flex; align-items: center; gap: 5px; }
+    .tag-rm { background: none; border: none; cursor: pointer; color: var(--muted); font-size: .9rem; line-height: 1; padding: 0; }
+    .tags-input { border: none; outline: none; background: transparent; font-family: inherit; font-size: .88rem; color: var(--ink); min-width: 80px; flex: 1; }
+
+    /* ── Specs (chave:valor) ── */
+    .spec-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .spec-row input { flex: 1; padding: 7px 10px; border: 1px solid var(--hair); border-radius: var(--r-sm); background: var(--bg); color: var(--ink); font-family: inherit; font-size: .85rem; }
+    .spec-row input:focus { outline: 2px solid var(--gold); }
+    .spec-rm { background: none; border: none; cursor: pointer; color: #ef4444; font-size: 1rem; padding: 4px; flex-shrink: 0; }
+
+    /* ── Toast ── */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px); background: #18181b; color: #fff; border-radius: var(--r-md); padding: 10px 20px; font-size: .88rem; font-weight: 500; z-index: 999; transition: transform .25s; pointer-events: none; white-space: nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.err { background: #ef4444; }
+
+    /* ── Loading skeleton ── */
+    .sk { background: linear-gradient(90deg, var(--surface-2) 25%, var(--bg-2) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: sk 1.4s infinite; border-radius: 4px; }
+    @keyframes sk { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+    @media (max-width: 600px) {
+      .frow, .frow.three { grid-template-columns: 1fr; }
+      .adm-body { padding: 14px; }
     }
-    .adm-field input:focus, .adm-field textarea:focus, .adm-field select:focus { outline: 2px solid var(--gold); }
-    .adm-field.full { grid-column: 1 / -1; }
-    .adm-field textarea { min-height: 80px; resize: vertical; }
-    .form-msg { color: #16a34a; font-size: .85rem; font-weight: 600; }
-
-    /* CSV */
-    .csv-area { width: 100%; min-height: 120px; background: var(--bg); border: 1px solid var(--hair); border-radius: var(--r-sm); color: var(--ink); font-family: monospace; font-size: .8rem; padding: 12px; resize: vertical; }
-    .csv-hint { font-size: .78rem; color: var(--muted); margin-top: 8px; }
-    .csv-hint code { background: var(--surface-2); border-radius: 4px; padding: 1px 5px; font-size: .75rem; }
-
-    /* Login */
-    .login-box { max-width: 360px; margin: 80px auto; background: var(--bg-2); border: 1px solid var(--hair); border-radius: var(--r-lg); padding: 40px 32px; text-align: center; }
-    .login-box h2 { margin-bottom: 8px; }
-    .login-box p { color: var(--muted); font-size: .9rem; margin-bottom: 24px; }
-    .login-box input { width: 100%; padding: 12px 16px; border: 1px solid var(--hair); border-radius: var(--r-sm); background: var(--bg); color: var(--ink); font-family: inherit; font-size: .95rem; margin-bottom: 14px; }
-    .login-box input:focus { outline: 2px solid var(--gold); }
-    .err-msg { color: #ef4444; font-size: .85rem; margin-bottom: 10px; }
   </style>
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
 
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-    <defs>
-      <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9ecef"/><stop offset="0.5" stop-color="#a7adb6"/><stop offset="1" stop-color="#6f757e"/></linearGradient>
-      <radialGradient id="iris" cx="0.38" cy="0.35" r="0.75"><stop offset="0" stop-color="#ffe066"/><stop offset="0.55" stop-color="#f5be00"/><stop offset="1" stop-color="#c8920a"/></radialGradient>
-    </defs>
-    <symbol id="eye" viewBox="0 0 120 70">
-      <path d="M6 34 C 30 8, 92 8, 116 30 C 92 18, 40 20, 14 38 Z" fill="url(#silver)"/>
-      <path d="M10 40 C 34 60, 92 60, 112 42 C 90 54, 40 56, 18 44 Z" fill="#f3f4f6"/>
-      <circle cx="68" cy="34" r="15.5" fill="url(#iris)"/>
-      <circle cx="71" cy="36" r="6.4" fill="#0a0a0a"/>
-      <circle cx="64.5" cy="29.5" r="2.6" fill="#ffffff" opacity="0.9"/>
-    </symbol>
-  </svg>
-
   <!-- Login -->
-  <div id="loginBox" class="login-box" style="display:none">
-    <svg viewBox="0 0 120 70" width="60" height="36" style="margin:0 auto 16px" aria-hidden="true"><use href="#eye"/></svg>
-    <h2>Admin — Produtos</h2>
-    <p>Acesso restrito à equipe.</p>
-    <p id="loginError" class="err-msg" hidden>Senha incorreta.</p>
-    <form id="loginForm">
-      <input type="password" id="adminPw" placeholder="Senha" autocomplete="current-password" />
-      <button class="btn btn-primary btn-block" type="submit" style="width:100%;justify-content:center">Entrar</button>
-    </form>
+  <div id="loginWrap" class="login-wrap">
+    <div class="login-card">
+      <svg viewBox="0 0 120 70" width="56" height="33" style="margin:0 auto 16px;display:block" aria-hidden="true">
+        <circle cx="60" cy="35" r="18" fill="none" stroke="var(--gold)" stroke-width="5"/>
+        <circle cx="60" cy="35" r="7" fill="var(--gold)"/>
+      </svg>
+      <h2>Admin — Óticas Relux</h2>
+      <p>Acesso restrito à equipe.</p>
+      <p id="loginErr" class="login-err">Usuário ou senha incorretos.</p>
+      <form id="loginForm">
+        <input type="text" id="loginUser" placeholder="Usuário" autocomplete="username" required />
+        <input type="password" id="loginPass" placeholder="Senha" autocomplete="current-password" required />
+        <button class="btn btn-primary btn-block" type="submit" style="width:100%;justify-content:center">Entrar</button>
+      </form>
+    </div>
   </div>
 
-  <!-- Admin -->
-  <div id="adminContent" class="adm-wrap" style="display:none">
-    <div class="container">
-      <div class="adm-header">
-        <div>
-          <a href="dashboard.html" style="color:var(--muted);font-size:.85rem">← Dashboard</a>
-          <h1 style="font-size:1.5rem;margin-top:4px">Gerenciar Produtos <span id="totalCount" style="font-size:.9rem;font-weight:400;color:var(--muted)"></span></h1>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-ghost" id="exportBtn" type="button">Exportar JSON</button>
-          <button class="btn btn-ghost" id="clearExtras" type="button">Limpar adicionados</button>
-          <button class="btn btn-ghost" id="logoutBtn" type="button">Sair</button>
-        </div>
+  <!-- Admin App -->
+  <div id="admApp" class="adm">
+    <header class="adm-top">
+      <h1>Admin Produtos</h1>
+      <a href="index.html" class="btn btn-ghost" style="font-size:.82rem">Ver site</a>
+      <button id="logoutBtn" class="btn btn-ghost" style="font-size:.82rem">Sair</button>
+    </header>
+
+    <div class="adm-body">
+      <!-- Stats -->
+      <div class="stats" id="statsBar">
+        <div class="stat"><div class="stat-n sk" style="width:32px;height:28px"></div><div class="stat-l">Total</div></div>
       </div>
 
-      <!-- Adicionar individualmente -->
-      <div class="adm-section">
-        <h3>Adicionar produto</h3>
-        <form id="addForm">
-          <div class="adm-form">
-            <div class="adm-field">
-              <label>ID único *</label>
-              <input id="pId" placeholder="ex: oakley-new-2024" />
-            </div>
-            <div class="adm-field">
-              <label>Nome *</label>
-              <input id="pName" placeholder="Nome do produto" required />
-            </div>
-            <div class="adm-field">
-              <label>Marca *</label>
-              <input id="pBrand" placeholder="Ray-Ban, Oakley..." required />
-            </div>
-            <div class="adm-field">
-              <label>Categoria *</label>
-              <select id="pCategory" required>
-                <option value="">Selecione</option>
-                <option>Óculos de Sol</option>
-                <option>Óculos de Grau</option>
-                <option>Lentes de Contato</option>
-                <option>Linha Infantil</option>
-              </select>
-            </div>
-            <div class="adm-field">
-              <label>Preço *</label>
-              <input id="pPrice" placeholder="R$ 0,00" required />
-            </div>
-            <div class="adm-field">
-              <label>Preço antigo</label>
-              <input id="pOldPrice" placeholder="R$ 0,00 (opcional)" />
-            </div>
-            <div class="adm-field">
-              <label>Badge</label>
-              <input id="pBadge" placeholder="-20%, Novo..." />
-            </div>
-            <div class="adm-field">
-              <label>Parcelas</label>
-              <input id="pInstallment" placeholder="ou 10x de R$ 0,00 sem juros" />
-            </div>
-            <div class="adm-field">
-              <label>Avaliação</label>
-              <input id="pRating" placeholder="4.8" />
-            </div>
-            <div class="adm-field">
-              <label>Forma SVG</label>
-              <select id="pShape">
-                <option value="g-sun">Sol (g-sun)</option>
-                <option value="g-optic">Grau (g-optic)</option>
-                <option value="g-round">Redondo (g-round)</option>
-                <option value="g-sport">Esportivo (g-sport)</option>
-                <option value="g-lens">Lente (g-lens)</option>
-              </select>
-            </div>
-            <div class="adm-field">
-              <label>Tom (a/b/c/d)</label>
-              <select id="pTone">
-                <option value="a">a (amarelo)</option>
-                <option value="b">b (azul)</option>
-                <option value="c">c (verde)</option>
-                <option value="d">d (roxo)</option>
-              </select>
-            </div>
-            <div class="adm-field">
-              <label>URL da imagem</label>
-              <input id="pImg" placeholder="assets/img/produtos/nome.png" />
-            </div>
-            <div class="adm-field full">
-              <label>Cores (separadas por vírgula)</label>
-              <input id="pColors" placeholder="Preto, Dourado, Prata" />
-            </div>
-            <div class="adm-field full">
-              <label>Descrição</label>
-              <textarea id="pDesc" placeholder="Descrição do produto..."></textarea>
-            </div>
-            <div class="adm-field full">
-              <label>Especificações (uma por linha, formato <code>Chave: Valor</code>)</label>
-              <textarea id="pSpecs" placeholder="Material: Acetato&#10;Proteção: UV400&#10;Formato: Aviador"></textarea>
-            </div>
-          </div>
-          <div style="margin-top:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-            <button class="btn btn-primary" type="submit">Adicionar produto</button>
-            <span id="formMsg" class="form-msg" hidden></span>
-          </div>
-        </form>
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <input type="search" id="searchQ" placeholder="Buscar produto..." />
+        <select id="filterCat">
+          <option value="">Todas categorias</option>
+          <option>Óculos de Sol</option>
+          <option>Óculos de Grau</option>
+          <option>Lentes de Contato</option>
+          <option>Linha Infantil</option>
+        </select>
+        <select id="filterStatus">
+          <option value="">Ativos + Inativos</option>
+          <option value="1">Somente ativos</option>
+          <option value="0">Somente inativos</option>
+        </select>
+        <button id="newBtn" class="btn btn-primary">+ Novo produto</button>
       </div>
 
-      <!-- Importação CSV -->
-      <div class="adm-section">
-        <h3>Importar via CSV (em massa)</h3>
-        <p class="csv-hint">Colunas obrigatórias: <code>id</code>, <code>name</code>, <code>brand</code>, <code>category</code>, <code>price</code><br>
-        Opcionais: <code>oldprice</code>, <code>badge</code>, <code>installment</code>, <code>rating</code>, <code>img</code>, <code>shape</code>, <code>tone</code>, <code>colors</code> (separados por <code>|</code>), <code>desc</code><br>
-        Exemplo: <code>id,name,brand,category,price,colors,desc</code></p>
-        <textarea class="csv-area" id="csvArea" placeholder="id,name,brand,category,price,oldprice,badge,installment,colors,desc&#10;meu-produto-1,Óculos Top,Ray-Ban,Óculos de Sol,R$ 599,,,-20%,10x de R$ 59,90,Preto|Dourado,Óculos incrível..."></textarea>
-        <div style="margin-top:12px">
-          <button class="btn btn-primary" id="csvImport" type="button">Importar CSV</button>
-        </div>
-      </div>
-
-      <!-- Tabela de produtos -->
-      <div class="adm-section">
-        <h3>Todos os produtos</h3>
-        <div style="overflow-x:auto">
-          <table class="adm-table">
-            <thead>
-              <tr>
-                <th>Marca</th>
-                <th>Nome</th>
-                <th>Categoria</th>
-                <th>Preço</th>
-                <th>ID</th>
-                <th>Ação</th>
-              </tr>
-            </thead>
-            <tbody id="prodBody"></tbody>
-          </table>
-        </div>
+      <!-- Tabela -->
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Foto</th>
+              <th>Nome</th>
+              <th>Marca</th>
+              <th>Categoria</th>
+              <th>Preço</th>
+              <th>Ativo</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="prodTbody"></tbody>
+        </table>
       </div>
     </div>
   </div>
 
+  <!-- Drawer (Add / Edit) -->
+  <div id="drawerOverlay" class="drawer-overlay"></div>
+  <div id="drawer" class="drawer" role="dialog" aria-modal="true" aria-label="Formulário de produto">
+    <div class="drawer-head">
+      <h2 id="drawerTitle">Novo Produto</h2>
+      <button id="drawerClose" class="btn btn-ghost" style="padding:6px 12px">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody">
+
+      <p class="fsec">Identificação</p>
+      <div class="frow">
+        <div class="fg">
+          <label>ID único *</label>
+          <input id="fId" placeholder="rb-aviador-dourado" />
+        </div>
+        <div class="fg">
+          <label>Marca *</label>
+          <input id="fBrand" placeholder="Ray-Ban" />
+        </div>
+      </div>
+      <div class="fg">
+        <label>Nome do produto *</label>
+        <input id="fName" placeholder="Aviador Classic Dourado" />
+      </div>
+      <div class="frow">
+        <div class="fg">
+          <label>Categoria *</label>
+          <select id="fCat">
+            <option value="">Selecione</option>
+            <option>Óculos de Sol</option>
+            <option>Óculos de Grau</option>
+            <option>Lentes de Contato</option>
+            <option>Linha Infantil</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Ordem (sort)</label>
+          <input id="fSort" type="number" placeholder="100" />
+        </div>
+      </div>
+
+      <p class="fsec">Imagem principal</p>
+      <div class="fg">
+        <label>Upload ou URL</label>
+        <div class="img-upload-box" id="mainImgBox">
+          <input type="file" id="mainImgFile" accept="image/*" />
+          <img id="mainImgPreview" class="img-preview" alt="preview" />
+          <div id="mainImgHint" class="img-upload-hint">Clique para selecionar uma foto<br><span style="font-size:.72rem">JPG, PNG, WebP até 5 MB</span></div>
+          <div id="mainUploadProg" class="upload-prog">Enviando...</div>
+        </div>
+        <input id="fImg" placeholder="https://... ou assets/img/produtos/..." style="margin-top:8px" />
+      </div>
+
+      <p class="fsec">Galeria (fotos adicionais)</p>
+      <div id="galleryGrid" class="gallery-grid"></div>
+      <div class="gallery-add-box" id="galleryAddBox" title="Adicionar foto">
+        <input type="file" id="galleryFile" accept="image/*" />
+        +
+      </div>
+
+      <p class="fsec">Preços e destaque</p>
+      <div class="frow three">
+        <div class="fg">
+          <label>Preço (R$) *</label>
+          <input id="fPrice" type="number" step="0.01" placeholder="599.00" />
+        </div>
+        <div class="fg">
+          <label>Preço antigo (R$)</label>
+          <input id="fOldPrice" type="number" step="0.01" placeholder="749.00" />
+        </div>
+        <div class="fg">
+          <label>Badge</label>
+          <input id="fBadge" placeholder="-20%, Novo..." />
+        </div>
+      </div>
+      <div class="fg">
+        <label>Parcelas</label>
+        <input id="fInstallment" placeholder="ou 10x de R$ 59,90 sem juros" />
+      </div>
+
+      <p class="fsec">Visual (card)</p>
+      <div class="frow">
+        <div class="fg">
+          <label>Forma SVG</label>
+          <select id="fShape">
+            <option value="g-sun">Sol (g-sun)</option>
+            <option value="g-optic">Grau (g-optic)</option>
+            <option value="g-round">Redondo (g-round)</option>
+            <option value="g-sport">Esportivo (g-sport)</option>
+            <option value="g-lens">Lente (g-lens)</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Tom de fundo</label>
+          <select id="fTone">
+            <option value="a">a — Dourado</option>
+            <option value="b">b — Azul</option>
+            <option value="c">c — Verde</option>
+            <option value="d">d — Roxo</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="fsec">Variações / Cores disponíveis</p>
+      <div class="fg">
+        <label>Cores (Enter ou vírgula para adicionar)</label>
+        <div class="tags-wrap" id="colorsTags">
+          <input class="tags-input" id="colorsInput" placeholder="Preto, Dourado..." />
+        </div>
+      </div>
+
+      <p class="fsec">Descrição</p>
+      <div class="fg">
+        <label>Texto de descrição</label>
+        <textarea id="fDesc" placeholder="Descreva o produto..."></textarea>
+      </div>
+
+      <p class="fsec">Especificações técnicas</p>
+      <div id="specsRows"></div>
+      <button type="button" id="addSpecBtn" class="btn btn-ghost" style="font-size:.82rem;margin-bottom:16px">+ Adicionar especificação</button>
+
+      <p class="fsec">Status</p>
+      <div class="fg">
+        <label class="toggle-wrap" style="flex-direction:row;align-items:center;gap:10px;cursor:pointer">
+          <label class="toggle"><input type="checkbox" id="fActive" checked /><span class="toggle-slider"></span></label>
+          <span style="font-size:.9rem;font-weight:600">Produto ativo (visível no site)</span>
+        </label>
+      </div>
+
+    </div>
+    <div class="drawer-foot">
+      <button id="saveBtn" class="btn btn-primary">Salvar produto</button>
+      <button id="drawerCancelBtn" class="btn btn-ghost">Cancelar</button>
+      <span id="saveMsg" style="font-size:.82rem;color:var(--muted);align-self:center"></span>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
   <script src="assets/js/products.js"></script>
-  <script src="assets/js/main.js"></script>
   <script src="assets/js/admin-produtos.js"></script>
 </body>
 </html>

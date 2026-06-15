@@ -1,176 +1,469 @@
-/* ÓTICAS RELUX — Admin: Cadastro em Massa de Produtos */
+/* Óticas Relux — Admin Produtos (Supabase via /api/admin) */
 (function () {
   "use strict";
 
-  var SENHA = "relux2024";
-  var EXTRA_KEY = "relux-products-extra";
+  var ADMIN_USER = "RELUXADMIN";
+  var ADMIN_PASS = "DOMINGO12";
+  var API = "/api/admin";
 
+  /* ── helpers DOM ── */
   function el(id) { return document.getElementById(id); }
+  function val(id) { return (el(id) && el(id).value || "").trim(); }
+  function setVal(id, v) { if (el(id)) el(id).value = v == null ? "" : v; }
 
-  /* ── Auth ── */
-  function checkAuth() {
-    var ok = sessionStorage.getItem("relux-admin") === "1";
-    if (!ok) {
-      el("loginBox").style.display = "";
-      el("adminContent").style.display = "none";
+  /* ── toast ── */
+  var toastTimer;
+  function toast(msg, err) {
+    var t = el("toast");
+    t.textContent = msg;
+    t.className = "toast show" + (err ? " err" : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.className = "toast"; }, 3200);
+  }
+
+  /* ── auth ── */
+  function getAuth() { try { return JSON.parse(sessionStorage.getItem("relux-adm")) || null; } catch (e) { return null; } }
+  function setAuth(u, p) { sessionStorage.setItem("relux-adm", JSON.stringify({ u: u, p: p })); }
+  function clearAuth() { sessionStorage.removeItem("relux-adm"); }
+
+  function checkLogin() {
+    var a = getAuth();
+    if (a && a.u === ADMIN_USER && a.p === ADMIN_PASS) {
+      showAdmin();
     } else {
-      el("loginBox").style.display = "none";
-      el("adminContent").style.display = "";
-      render();
+      el("loginWrap").style.display = "";
+      el("admApp").classList.remove("visible");
     }
+  }
+
+  function showAdmin() {
+    el("loginWrap").style.display = "none";
+    el("admApp").classList.add("visible");
+    loadProducts();
   }
 
   el("loginForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    if (el("adminPw").value === SENHA) {
-      sessionStorage.setItem("relux-admin", "1");
-      el("loginError").hidden = true;
-      checkAuth();
+    var u = val("loginUser"), p = val("loginPass");
+    if (u === ADMIN_USER && p === ADMIN_PASS) {
+      setAuth(u, p);
+      el("loginErr").style.display = "none";
+      showAdmin();
     } else {
-      el("loginError").hidden = false;
+      el("loginErr").style.display = "";
     }
   });
 
   el("logoutBtn").addEventListener("click", function () {
-    sessionStorage.removeItem("relux-admin");
-    checkAuth();
+    clearAuth();
+    checkLogin();
   });
 
-  /* ── Extra products in localStorage ── */
-  function getExtra() { try { return JSON.parse(localStorage.getItem(EXTRA_KEY)) || []; } catch (e) { return []; } }
-  function saveExtra(list) { try { localStorage.setItem(EXTRA_KEY, JSON.stringify(list)); } catch (e) {} }
-  function allProducts() { return (window.RELUX_PRODUCTS || []).concat(getExtra()); }
+  /* ── API call ── */
+  function api(body) {
+    var a = getAuth() || {};
+    return fetch(API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Admin-User": a.u || "",
+        "X-Admin-Pass": a.p || "",
+      },
+      body: JSON.stringify(body),
+    }).then(function (r) {
+      return r.json().then(function (d) {
+        if (!r.ok) throw new Error(d.error || "Erro " + r.status);
+        return d;
+      });
+    });
+  }
+
+  /* ── State ── */
+  var allProducts = [];
+  var editId = null; // null = novo produto
+  var colorsList = [];
+  var gallery = [];
+
+  /* ── Load produtos ── */
+  function loadProducts() {
+    el("prodTbody").innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Carregando...</td></tr>';
+    api({ action: "list" })
+      .then(function (data) {
+        allProducts = data || [];
+        renderStats();
+        renderTable();
+      })
+      .catch(function (e) {
+        el("prodTbody").innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#ef4444">' + e.message + '</td></tr>';
+        if (e.message && e.message.indexOf("SUPABASE_SERVICE_KEY") > -1) {
+          toast("Configure SUPABASE_SERVICE_KEY no Vercel!", true);
+        }
+      });
+  }
+
+  /* ── Stats ── */
+  function renderStats() {
+    var total = allProducts.length;
+    var ativos = allProducts.filter(function (p) { return p.active; }).length;
+    var sol = allProducts.filter(function (p) { return p.category === "Óculos de Sol"; }).length;
+    var grau = allProducts.filter(function (p) { return p.category === "Óculos de Grau"; }).length;
+    el("statsBar").innerHTML = [
+      ["Total", total],
+      ["Ativos", ativos],
+      ["Sol", sol],
+      ["Grau", grau],
+    ].map(function (s) {
+      return '<div class="stat"><div class="stat-n">' + s[1] + '</div><div class="stat-l">' + s[0] + '</div></div>';
+    }).join("");
+  }
+
+  /* ── Filtros ── */
+  function getFiltered() {
+    var q = (el("searchQ") && el("searchQ").value || "").toLowerCase().trim();
+    var cat = val("filterCat");
+    var status = val("filterStatus");
+    return allProducts.filter(function (p) {
+      if (cat && p.category !== cat) return false;
+      if (status === "1" && !p.active) return false;
+      if (status === "0" && p.active) return false;
+      if (q) {
+        var txt = [(p.name || ""), (p.brand || ""), (p.id || ""), (p.category || "")].join(" ").toLowerCase();
+        if (txt.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+  }
+
+  el("searchQ").addEventListener("input", renderTable);
+  el("filterCat").addEventListener("change", renderTable);
+  el("filterStatus").addEventListener("change", renderTable);
 
   /* ── Render tabela ── */
-  function render() {
-    var list = allProducts();
-    el("totalCount").textContent = list.length + " produtos";
-    var tbody = el("prodBody");
-    tbody.innerHTML = list.map(function (p, i) {
-      var isExtra = i >= (window.RELUX_PRODUCTS || []).length;
-      return "<tr>" +
-        "<td>" + p.brand + "</td>" +
-        "<td>" + p.name + "</td>" +
-        "<td>" + p.category + "</td>" +
-        "<td>" + p.price + "</td>" +
-        "<td>" + p.id + "</td>" +
-        "<td>" + (isExtra ? '<button class="btn-rm" data-rm="' + p.id + '">Remover</button>' : '<span style="color:var(--muted);font-size:.8rem">Base</span>') + "</td>" +
-        "</tr>";
+  function renderTable() {
+    var list = getFiltered();
+    if (!list.length) {
+      el("prodTbody").innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted)">Nenhum produto encontrado.</td></tr>';
+      return;
+    }
+    el("prodTbody").innerHTML = list.map(function (p) {
+      var thumb = p.img
+        ? '<img class="thumb" src="' + p.img + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">'
+        : '<div class="thumb-ph">sem foto</div>';
+      var priceStr = p.price != null ? "R$ " + Number(p.price).toFixed(2).replace(".", ",") : "—";
+      return '<tr data-id="' + p.id + '">' +
+        '<td>' + thumb + '</td>' +
+        '<td><strong>' + (p.name || "") + '</strong><br><span style="font-size:.75rem;color:var(--muted)">' + (p.id || "") + '</span></td>' +
+        '<td>' + (p.brand || "") + '</td>' +
+        '<td><span class="badge-cat">' + (p.category || "") + '</span></td>' +
+        '<td>' + priceStr + '</td>' +
+        '<td><label class="toggle"><input type="checkbox" ' + (p.active ? "checked" : "") + ' data-toggle="' + p.id + '" /><span class="toggle-slider"></span></label></td>' +
+        '<td><div class="row-actions"><button class="btn-edit" data-edit="' + p.id + '">Editar</button><button class="btn-del" data-del="' + p.id + '">Excluir</button></div></td>' +
+        '</tr>';
     }).join("");
 
-    tbody.querySelectorAll(".btn-rm").forEach(function (btn) {
+    /* toggle active */
+    el("prodTbody").querySelectorAll("[data-toggle]").forEach(function (cb) {
+      cb.addEventListener("change", function () {
+        var id = cb.getAttribute("data-toggle");
+        api({ action: "update", id: id, data: { active: cb.checked } })
+          .then(function () {
+            var p = allProducts.find(function (x) { return x.id === id; });
+            if (p) p.active = cb.checked;
+            renderStats();
+            toast(cb.checked ? "Produto ativado." : "Produto desativado.");
+          })
+          .catch(function (e) { toast(e.message, true); cb.checked = !cb.checked; });
+      });
+    });
+
+    /* edit */
+    el("prodTbody").querySelectorAll("[data-edit]").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        var id = btn.getAttribute("data-rm");
-        if (!confirm("Remover produto " + id + "?")) return;
-        var ex = getExtra().filter(function (p) { return p.id !== id; });
-        saveExtra(ex);
-        render();
+        var p = allProducts.find(function (x) { return x.id === btn.getAttribute("data-edit"); });
+        if (p) openDrawer(p);
+      });
+    });
+
+    /* delete */
+    el("prodTbody").querySelectorAll("[data-del]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var id = btn.getAttribute("data-del");
+        var p = allProducts.find(function (x) { return x.id === id; });
+        if (!confirm('Excluir "' + (p ? p.name : id) + '"? Esta ação não pode ser desfeita.')) return;
+        api({ action: "delete", id: id })
+          .then(function () {
+            allProducts = allProducts.filter(function (x) { return x.id !== id; });
+            renderStats();
+            renderTable();
+            toast("Produto excluído.");
+          })
+          .catch(function (e) { toast(e.message, true); });
       });
     });
   }
 
-  /* ── Formulário individual ── */
-  el("addForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    var v = function (id) { return (el(id) && el(id).value || "").trim(); };
-    var id = v("pId") || v("pName").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    if (!id || !v("pName") || !v("pBrand") || !v("pCategory") || !v("pPrice")) {
-      alert("Preencha ao menos: ID, Nome, Marca, Categoria e Preço."); return;
-    }
-    var extra = getExtra();
-    if (allProducts().some(function (p) { return p.id === id; })) {
-      alert("Já existe um produto com este ID: " + id); return;
-    }
-    var colors = v("pColors").split(",").map(function (c) { return c.trim(); }).filter(Boolean);
-    var specs = v("pSpecs").split("\n").map(function (l) {
-      var parts = l.split(":"); return parts.length >= 2 ? [parts[0].trim(), parts.slice(1).join(":").trim()] : null;
-    }).filter(Boolean);
+  /* ── Drawer ── */
+  function openDrawer(p) {
+    editId = p ? p.id : null;
+    el("drawerTitle").textContent = p ? "Editar Produto" : "Novo Produto";
+    el("saveMsg").textContent = "";
 
-    extra.push({
-      id: id, brand: v("pBrand"), name: v("pName"), category: v("pCategory"),
-      img: v("pImg") || "", shape: v("pShape") || "g-sun", tone: v("pTone") || "a",
-      price: v("pPrice"), oldPrice: v("pOldPrice"), badge: v("pBadge"),
-      installment: v("pInstallment"), rating: v("pRating") || "4.8", reviews: 0,
-      colors: colors.length ? colors : ["Único"],
-      desc: v("pDesc"),
+    /* preenche campos */
+    setVal("fId", p ? p.id : "");
+    el("fId").disabled = !!p; /* ID não pode mudar depois de criado */
+    setVal("fBrand", p ? p.brand : "Ray-Ban");
+    setVal("fName", p ? p.name : "");
+    setVal("fCat", p ? p.category : "");
+    setVal("fSort", p ? p.sort : 100);
+    setVal("fPrice", p ? p.price : "");
+    setVal("fOldPrice", p ? p.old_price : "");
+    setVal("fBadge", p ? p.badge : "");
+    setVal("fInstallment", p ? p.installment : "");
+    setVal("fShape", p ? (p.shape || "g-sun") : "g-sun");
+    setVal("fTone", p ? (p.tone || "a") : "a");
+    setVal("fDesc", p ? p.descricao : "");
+    el("fActive").checked = p ? !!p.active : true;
+
+    /* imagem principal */
+    setVal("fImg", p ? (p.img || "") : "");
+    el("mainImgPreview").style.display = p && p.img ? "block" : "none";
+    if (p && p.img) el("mainImgPreview").src = p.img;
+    el("mainImgHint").style.display = p && p.img ? "none" : "";
+
+    /* galeria */
+    gallery = p && Array.isArray(p.gallery) ? p.gallery.slice() : [];
+    renderGallery();
+
+    /* cores */
+    colorsList = [];
+    var rawColors = p ? (p.colors || []) : [];
+    rawColors.forEach(function (c) { if (c) colorsList.push(typeof c === "string" ? c : (c.name || "")); });
+    renderTags();
+
+    /* specs */
+    var specs = p && Array.isArray(p.specs) ? p.specs : [];
+    el("specsRows").innerHTML = "";
+    specs.forEach(function (s) { addSpecRow(s[0] || "", s[1] || ""); });
+
+    el("drawerOverlay").classList.add("open");
+    el("drawer").classList.add("open");
+    el("drawer").querySelector("input:not([disabled])").focus();
+  }
+
+  function closeDrawer() {
+    el("drawerOverlay").classList.remove("open");
+    el("drawer").classList.remove("open");
+    editId = null;
+  }
+
+  el("newBtn").addEventListener("click", function () { openDrawer(null); });
+  el("drawerClose").addEventListener("click", closeDrawer);
+  el("drawerCancelBtn").addEventListener("click", closeDrawer);
+  el("drawerOverlay").addEventListener("click", closeDrawer);
+
+  /* ── Image upload (main) ── */
+  el("mainImgFile").addEventListener("change", function () {
+    var file = this.files[0];
+    if (!file) return;
+    el("mainUploadProg").style.display = "";
+    el("mainImgHint").style.display = "none";
+    uploadFile(file, function (url) {
+      el("mainUploadProg").style.display = "none";
+      setVal("fImg", url);
+      el("mainImgPreview").src = url;
+      el("mainImgPreview").style.display = "block";
+    }, function (err) {
+      el("mainUploadProg").style.display = "none";
+      el("mainImgHint").style.display = "";
+      toast(err, true);
+    });
+  });
+
+  el("fImg").addEventListener("input", function () {
+    var url = this.value.trim();
+    if (url) { el("mainImgPreview").src = url; el("mainImgPreview").style.display = "block"; el("mainImgHint").style.display = "none"; }
+    else { el("mainImgPreview").style.display = "none"; el("mainImgHint").style.display = ""; }
+  });
+
+  /* ── Gallery ── */
+  el("galleryFile").addEventListener("change", function () {
+    var file = this.files[0];
+    if (!file) return;
+    this.disabled = true;
+    uploadFile(file, function (url) {
+      el("galleryFile").disabled = false;
+      el("galleryFile").value = "";
+      gallery.push(url);
+      renderGallery();
+      toast("Foto adicionada à galeria.");
+    }, function (err) {
+      el("galleryFile").disabled = false;
+      el("galleryFile").value = "";
+      toast(err, true);
+    });
+  });
+
+  function renderGallery() {
+    var grid = el("galleryGrid");
+    grid.innerHTML = gallery.map(function (url, i) {
+      return '<div class="gallery-item">' +
+        '<img src="' + url + '" alt="" loading="lazy">' +
+        '<button class="gallery-rm" data-gi="' + i + '" title="Remover">✕</button>' +
+        '</div>';
+    }).join("");
+    grid.querySelectorAll(".gallery-rm").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        gallery.splice(Number(btn.getAttribute("data-gi")), 1);
+        renderGallery();
+      });
+    });
+  }
+
+  /* ── Cores / Tags ── */
+  function addTag(name) {
+    name = name.trim();
+    if (!name || colorsList.indexOf(name) > -1) return;
+    colorsList.push(name);
+    renderTags();
+  }
+
+  function renderTags() {
+    var wrap = el("colorsTags");
+    wrap.querySelectorAll(".tag").forEach(function (t) { t.remove(); });
+    var input = el("colorsInput");
+    colorsList.forEach(function (c) {
+      var tag = document.createElement("span");
+      tag.className = "tag";
+      tag.innerHTML = c + '<button class="tag-rm" data-tag="' + c + '" title="Remover">✕</button>';
+      tag.querySelector(".tag-rm").addEventListener("click", function () {
+        colorsList = colorsList.filter(function (x) { return x !== c; });
+        renderTags();
+      });
+      wrap.insertBefore(tag, input);
+    });
+  }
+
+  el("colorsInput").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTag(this.value.replace(/,$/, ""));
+      this.value = "";
+    }
+    if (e.key === "Backspace" && !this.value && colorsList.length) {
+      colorsList.pop();
+      renderTags();
+    }
+  });
+  el("colorsInput").addEventListener("blur", function () {
+    if (this.value.trim()) { addTag(this.value); this.value = ""; }
+  });
+  el("colorsTags").addEventListener("click", function () { el("colorsInput").focus(); });
+
+  /* ── Specs ── */
+  function addSpecRow(k, v) {
+    var row = document.createElement("div");
+    row.className = "spec-row";
+    row.innerHTML =
+      '<input placeholder="Característica (ex: Material)" value="' + (k || "") + '" />' +
+      '<input placeholder="Valor (ex: Acetato)" value="' + (v || "") + '" />' +
+      '<button class="spec-rm" title="Remover">✕</button>';
+    row.querySelector(".spec-rm").addEventListener("click", function () { row.remove(); });
+    el("specsRows").appendChild(row);
+  }
+  el("addSpecBtn").addEventListener("click", function () { addSpecRow("", ""); });
+
+  /* ── Upload helper ── */
+  function uploadFile(file, onSuccess, onError) {
+    var a = getAuth() || {};
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var base64 = ev.target.result.split(",")[1];
+      fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Admin-User": a.u || "",
+          "X-Admin-Pass": a.p || "",
+        },
+        body: JSON.stringify({ action: "upload", filename: file.name, base64: base64, mime: file.type }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          if (d.url) onSuccess(d.url);
+          else onError(d.error || "Erro no upload.");
+        })
+        .catch(function (e) { onError(e.message); });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /* ── Salvar ── */
+  el("saveBtn").addEventListener("click", function () {
+    var id = val("fId");
+    if (!id) { toast("ID é obrigatório.", true); return; }
+    if (!val("fName")) { toast("Nome é obrigatório.", true); return; }
+    if (!val("fBrand")) { toast("Marca é obrigatória.", true); return; }
+    if (!val("fCat")) { toast("Categoria é obrigatória.", true); return; }
+    if (!val("fPrice")) { toast("Preço é obrigatório.", true); return; }
+
+    /* specs */
+    var specs = [];
+    el("specsRows").querySelectorAll(".spec-row").forEach(function (row) {
+      var inputs = row.querySelectorAll("input");
+      var k = (inputs[0] && inputs[0].value || "").trim();
+      var v = (inputs[1] && inputs[1].value || "").trim();
+      if (k && v) specs.push([k, v]);
+    });
+
+    var data = {
+      brand: val("fBrand"),
+      name: val("fName"),
+      category: val("fCat"),
+      sort: parseInt(val("fSort") || "100", 10) || 100,
+      img: val("fImg") || null,
+      gallery: gallery.slice(),
+      shape: val("fShape") || "g-sun",
+      tone: val("fTone") || "a",
+      price: parseFloat(val("fPrice")) || 0,
+      old_price: val("fOldPrice") ? parseFloat(val("fOldPrice")) : null,
+      badge: val("fBadge") || "",
+      installment: val("fInstallment") || "",
+      colors: colorsList.slice(),
+      descricao: val("fDesc") || "",
       specs: specs,
-    });
-    saveExtra(extra);
-    el("addForm").reset();
-    el("formMsg").textContent = "Produto adicionado: " + id;
-    el("formMsg").hidden = false;
-    setTimeout(function () { el("formMsg").hidden = true; }, 3000);
-    render();
-  });
+      active: el("fActive").checked,
+    };
+    if (!editId) data.id = id; /* só no create */
 
-  /* ── Importação via CSV ── */
-  el("csvImport").addEventListener("click", function () {
-    var raw = (el("csvArea").value || "").trim();
-    if (!raw) { alert("Cole o CSV primeiro."); return; }
-    var lines = raw.split("\n");
-    var header = lines[0].split(",").map(function (h) { return h.trim().toLowerCase(); });
-    var imported = 0, errors = [];
-    var extra = getExtra();
-    lines.slice(1).forEach(function (line, idx) {
-      if (!line.trim()) return;
-      var cols = parseCsvLine(line);
-      var row = {};
-      header.forEach(function (h, i) { row[h] = (cols[i] || "").trim(); });
-      var id = row.id || (row.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      if (!id || !row.name || !row.brand || !row.category || !row.price) {
-        errors.push("Linha " + (idx + 2) + ": campos obrigatórios faltando (id, name, brand, category, price).");
-        return;
-      }
-      if (allProducts().some(function (p) { return p.id === id; }) || extra.some(function (p) { return p.id === id; })) {
-        errors.push("Linha " + (idx + 2) + ": ID já existe (" + id + "), pulado."); return;
-      }
-      extra.push({
-        id: id, brand: row.brand, name: row.name, category: row.category,
-        img: row.img || "", shape: row.shape || "g-sun", tone: row.tone || "a",
-        price: row.price, oldPrice: row.oldprice || "", badge: row.badge || "",
-        installment: row.installment || "", rating: row.rating || "4.8", reviews: 0,
-        colors: (row.colors || "Único").split("|").map(function (c) { return c.trim(); }),
-        desc: row.desc || "",
-        specs: [],
+    el("saveBtn").disabled = true;
+    el("saveMsg").textContent = "Salvando...";
+
+    var action = editId ? "update" : "create";
+    var payload = editId ? { action: action, id: editId, data: data } : { action: action, data: data };
+
+    api(payload)
+      .then(function (result) {
+        el("saveBtn").disabled = false;
+        el("saveMsg").textContent = "";
+        toast(editId ? "Produto atualizado!" : "Produto cadastrado!");
+        /* atualiza lista local */
+        if (editId) {
+          var idx = allProducts.findIndex(function (p) { return p.id === editId; });
+          if (idx > -1) allProducts[idx] = Object.assign(allProducts[idx], data);
+        } else {
+          allProducts.push(Object.assign({ id: id, created_at: new Date().toISOString() }, data));
+        }
+        renderStats();
+        renderTable();
+        closeDrawer();
+      })
+      .catch(function (e) {
+        el("saveBtn").disabled = false;
+        el("saveMsg").textContent = "";
+        toast(e.message || "Erro ao salvar.", true);
       });
-      imported++;
-    });
-    saveExtra(extra);
-    render();
-    var msg = "Importados: " + imported + " produto(s).";
-    if (errors.length) msg += "\n\nAvisos:\n" + errors.join("\n");
-    alert(msg);
-    el("csvArea").value = "";
   });
 
-  function parseCsvLine(line) {
-    var result = [], cur = "", inQ = false;
-    for (var i = 0; i < line.length; i++) {
-      var c = line[i];
-      if (c === '"') { inQ = !inQ; continue; }
-      if (c === "," && !inQ) { result.push(cur); cur = ""; continue; }
-      cur += c;
-    }
-    result.push(cur);
-    return result;
-  }
-
-  /* ── Export JSON ── */
-  el("exportBtn").addEventListener("click", function () {
-    var data = JSON.stringify(allProducts(), null, 2);
-    var blob = new Blob([data], { type: "application/json" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url; a.download = "relux-produtos.json"; a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  /* ── Limpar extras ── */
-  el("clearExtras").addEventListener("click", function () {
-    if (!confirm("Remover todos os produtos adicionados via admin? (Os produtos-base permanecem.)")) return;
-    saveExtra([]);
-    render();
-  });
-
-  checkAuth();
+  /* ── Init ── */
+  checkLogin();
 })();
