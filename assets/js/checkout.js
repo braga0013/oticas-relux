@@ -284,7 +284,7 @@
 
   function finalizeReal(o) {
     if (o.pm === "cartao") return payCard(o);
-    setProcessing(true, o.pm === "pix" ? "Gerando Pix..." : "Gerando boleto...");
+    setProcessing(true, "Gerando Pix...");
     window.RELUX_PAY.pay({ method: o.pm, amount: o.total, description: "Pedido " + o.num + " — Óticas Relux", payer: payerObj() })
       .then(function (res) {
         setProcessing(false);
@@ -310,9 +310,6 @@
           el("csMsg").textContent = "Escaneie o QR ou copie o código Pix no app do seu banco. A confirmação aparece aqui automaticamente.";
           document.querySelector(".cs-card h2").textContent = "Quase lá — pague o Pix";
           if (res.id) pollStatus(res.id);
-        } else {
-          pix.innerHTML = "<b>Boleto gerado</b><br>" + (res.ticket_url ? '<a href="' + res.ticket_url + '" target="_blank" rel="noopener">Abrir / imprimir boleto</a>' : "Link indisponível") + "<br><br><b>Total: " + fmt(o.total) + "</b>";
-          el("csMsg").textContent = "Pague o boleto para confirmar (compensa em até 2 dias úteis).";
         }
         saveOrder(o, "pendente", res.id);
         sendOrderEmail(o, "pendente");
