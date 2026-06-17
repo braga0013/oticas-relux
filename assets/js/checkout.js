@@ -435,12 +435,15 @@
     var its = items().map(function (it) {
       return { id: it.p.id, name: it.p.name, brand: it.p.brand || "", qty: it.qty, price: parseBRL(it.p.price) };
     });
+    /* inclui user_id se cliente estiver logado */
+    var userId = (window.RELUX_AUTH && window.RELUX_AUTH.current() && window.RELUX_AUTH.current().id) || null;
     fetch(apiBase + "/api/pedido", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action:           "create",
         numero:           o.num,
+        user_id:          userId,
         customer_name:    val("nome"),
         customer_email:   val("email") || null,
         customer_phone:   onlyDigits(val("tel")),

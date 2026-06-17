@@ -80,7 +80,8 @@ module.exports = async function handler(req, res) {
 
     var data = {
       numero:          body.numero,
-      customer_name:   body.customer_name  || null,
+      user_id:         body.user_id         || null,
+      customer_name:   body.customer_name   || null,
       customer_email:  body.customer_email || null,
       customer_phone:  body.customer_phone || null,
       customer_cpf:    body.customer_cpf   || null,

@@ -39,6 +39,27 @@
   var cart = read(CART_KEY);
   var fav  = read(FAV_KEY);
 
+  /* ── sync favoritos com Supabase ── */
+  function syncFavFromSupabase() {
+    var A = window.RELUX_AUTH;
+    if (!A || !A.current()) return;
+    A.getFavoritos().then(function(ids) {
+      /* merge: adiciona os do Supabase que não estão local */
+      ids.forEach(function(id) { if (fav.indexOf(id) < 0) fav.push(id); });
+      /* push: envia locais para o Supabase */
+      fav.forEach(function(id) {
+        if (ids.indexOf(id) < 0) A.addFavorito(id);
+      });
+      write(FAV_KEY, fav);
+      refreshUI(); renderFav();
+    });
+  }
+
+  /* ao autenticar: sincroniza favoritos */
+  document.addEventListener("relux:auth", function(e) {
+    if (e.detail) { syncFavFromSupabase(); }
+  });
+
   /* ---------- helpers de preço ---------- */
   function parseBRL(s) {
     if (typeof s !== "string") return 0;
@@ -100,11 +121,24 @@
   /* ---------- fav ops ---------- */
   function isFav(id) { return fav.indexOf(id) > -1; }
   function toggleFav(id) {
-    if (isFav(id)) { fav = fav.filter(function (x) { return x !== id; }); toast("Removido dos favoritos"); }
-    else { fav.push(id); toast("Adicionado aos favoritos ♥"); }
+    var A = window.RELUX_AUTH;
+    if (isFav(id)) {
+      fav = fav.filter(function (x) { return x !== id; });
+      toast("Removido dos favoritos");
+      if (A && A.current()) A.removeFavorito(id);
+    } else {
+      fav.push(id);
+      toast("Adicionado aos favoritos ♥");
+      if (A && A.current()) A.addFavorito(id);
+    }
     write(FAV_KEY, fav); refreshUI(); renderFav();
   }
-  function removeFav(id) { fav = fav.filter(function (x) { return x !== id; }); write(FAV_KEY, fav); refreshUI(); renderFav(); }
+  function removeFav(id) {
+    var A = window.RELUX_AUTH;
+    fav = fav.filter(function (x) { return x !== id; });
+    write(FAV_KEY, fav); refreshUI(); renderFav();
+    if (A && A.current()) A.removeFavorito(id);
+  }
 
   /* ============================================================
      DOM — drawers, backdrop, toast e modal de lentes
