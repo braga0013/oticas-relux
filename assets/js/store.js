@@ -286,14 +286,19 @@
     var cl = document.getElementById("cartClear");
     if (cl) cl.addEventListener("click", clearCart);
 
-    /* Exige login antes de ir para o checkout (mantém dados do cliente corretos) */
+    /* Exige login antes de ir para o checkout */
     var co = document.getElementById("cartCheckout");
     if (co) co.addEventListener("click", function (e) {
-      var u = window.RELUX_AUTH && window.RELUX_AUTH.current();
+      var A = window.RELUX_AUTH;
+      var u = A && A.current();
       if (!u) {
         e.preventDefault();
         toast("Entre na sua conta para finalizar a compra");
-        location.href = "conta.html?next=checkout.html";
+        /* pequena espera: dá chance ao auth async inicializar */
+        setTimeout(function() {
+          var u2 = A && A.current();
+          if (!u2) location.href = "conta.html?next=checkout.html";
+        }, 400);
       }
     });
     document.addEventListener("keydown", function (e) {

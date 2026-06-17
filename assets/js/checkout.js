@@ -252,11 +252,17 @@
   function setProcessing(on, label) { var b = el("coSubmit"); if (!b) return; b.disabled = on; b.style.opacity = on ? ".6" : ""; b.textContent = on ? (label || "Processando...") : "Finalizar pedido"; }
   function showError(msg) { setProcessing(false); alert(msg || "Não foi possível processar o pagamento. Tente novamente."); }
 
-  /* ---------- login obrigatório ---------- */
-  function requireLogin() {
-    var u = window.RELUX_AUTH && window.RELUX_AUTH.current();
-    if (!u) { location.replace("conta.html?next=checkout.html"); return false; }
-    return true;
+  /* ---------- login obrigatório (async-safe) ---------- */
+  function requireLogin(cb) {
+    var A = window.RELUX_AUTH;
+    if (A && A.onReady) {
+      A.onReady(function(u) {
+        if (!u) { location.replace("conta.html?next=checkout.html"); return; }
+        cb();
+      });
+    } else {
+      cb(); /* auth não disponível — deixa prosseguir */
+    }
   }
 
   /* ---------- finalizar: roteia real (Mercado Pago) x WhatsApp ---------- */
@@ -475,7 +481,10 @@
   }
 
   function init() {
-    if (!requireLogin()) return;
+    requireLogin(initCheckout);
+  }
+
+  function initCheckout() {
     renderSummary();
     fillInstallments();
     prefillFromAccount();
