@@ -1,9 +1,10 @@
 /* Óticas Relux — Admin API
    Autentica via X-Admin-User + X-Admin-Pass headers.
    Usa SUPABASE_SERVICE_KEY (env var no Vercel) para bypassar RLS. */
+const rateLimit = require("./_ratelimit");
 
-const ADMIN_USER = "RELUXADMIN";
-const ADMIN_PASS = "DOMINGO12";
+const ADMIN_USER = process.env.ADMIN_USER || "RELUXADMIN";
+const ADMIN_PASS = process.env.ADMIN_PASS || "DOMINGO12";
 const SB_URL = (process.env.SUPABASE_URL || "https://joktfcfcssxhhyiuxwer.supabase.co").replace(/\/$/, "");
 const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
 
@@ -34,8 +35,13 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();
 
+  const ip = req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown";
+  if (!rateLimit(ip, 30, 60000)) {
+    return res.status(429).json({ error: "Muitas requisições. Tente novamente em 1 minuto." });
+  }
+
   if (!SB_KEY) {
-    return res.status(500).json({ error: "SUPABASE_SERVICE_KEY não configurado no Vercel. Acesse Project Settings → API → service_role no Supabase e adicione como variável de ambiente." });
+    return res.status(500).json({ error: "SUPABASE_SERVICE_KEY não configurado no Vercel." });
   }
   if (!checkAuth(req)) {
     return res.status(401).json({ error: "Credenciais de admin inválidas." });
@@ -45,6 +51,11 @@ export default async function handler(req, res) {
   const action = body.action || req.query.action || "list";
 
   try {
+    /* ── Ping (verificar autenticação) ── */
+    if (action === "ping") {
+      return res.json({ ok: true });
+    }
+
     /* ── Listar todos (incluindo inativos) ── */
     if (action === "list") {
       const r = await sb("/rest/v1/produtos?select=*&order=sort.asc,created_at.asc", "GET");

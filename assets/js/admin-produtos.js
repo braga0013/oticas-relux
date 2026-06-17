@@ -2,8 +2,6 @@
 (function () {
   "use strict";
 
-  var ADMIN_USER = "RELUXADMIN";
-  var ADMIN_PASS = "DOMINGO12";
   var API = "/api/admin";
 
   /* ── helpers DOM ── */
@@ -28,7 +26,7 @@
 
   function checkLogin() {
     var a = getAuth();
-    if (a && a.u === ADMIN_USER && a.p === ADMIN_PASS) {
+    if (a && a.u && a.p) {
       showAdmin();
     } else {
       el("loginWrap").style.display = "";
@@ -45,13 +43,26 @@
   el("loginForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var u = val("loginUser"), p = val("loginPass");
-    if (u === ADMIN_USER && p === ADMIN_PASS) {
-      setAuth(u, p);
-      el("loginErr").style.display = "none";
-      showAdmin();
-    } else {
+    if (!u || !p) { el("loginErr").style.display = ""; return; }
+    var btn = el("loginForm").querySelector("button[type=submit]");
+    if (btn) btn.disabled = true;
+    fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Admin-User": u, "X-Admin-Pass": p },
+      body: JSON.stringify({ action: "ping" })
+    }).then(function (r) {
+      if (btn) btn.disabled = false;
+      if (r.ok) {
+        setAuth(u, p);
+        el("loginErr").style.display = "none";
+        showAdmin();
+      } else {
+        el("loginErr").style.display = "";
+      }
+    }).catch(function () {
+      if (btn) btn.disabled = false;
       el("loginErr").style.display = "";
-    }
+    });
   });
 
   el("logoutBtn").addEventListener("click", function () {

@@ -1,6 +1,7 @@
 /* ÓTICAS RELUX — Asaas — cria pagamento (Pix, Boleto, Cartão de Crédito).
    Requer a variável de ambiente ASAAS_API_KEY (chave de produção ou sandbox).
    NUNCA exponha a chave no front-end. */
+const rateLimit = require("./_ratelimit");
 
 function cors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -53,6 +54,11 @@ module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Método não permitido" });
+
+  const ip = req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "unknown";
+  if (!rateLimit(ip, 10, 60000)) {
+    return res.status(429).json({ error: "Muitas tentativas de pagamento. Aguarde 1 minuto." });
+  }
 
   const KEY = process.env.ASAAS_API_KEY;
   if (!KEY) return res.status(500).json({ error: "ASAAS_API_KEY não configurado no servidor." });

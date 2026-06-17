@@ -13,14 +13,17 @@ function cors(res) {
 function fmt(n) {
   return "R$ " + Number(n).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
+function esc(s) {
+  return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
 
 function buildHtml(o) {
   var itemRows = (o.items || []).map(function (it) {
     return (
       '<tr>' +
-      '<td style="padding:10px 16px;border-bottom:1px solid #f0f0f0;font-size:14px;color:#111">' + it.name + '</td>' +
-      '<td style="padding:10px 16px;border-bottom:1px solid #f0f0f0;font-size:14px;color:#555;text-align:center">' + it.qty + '</td>' +
-      '<td style="padding:10px 16px;border-bottom:1px solid #f0f0f0;font-size:14px;color:#111;text-align:right">' + it.price + '</td>' +
+      '<td style="padding:10px 16px;border-bottom:1px solid #f0f0f0;font-size:14px;color:#111">' + esc(it.name) + '</td>' +
+      '<td style="padding:10px 16px;border-bottom:1px solid #f0f0f0;font-size:14px;color:#555;text-align:center">' + esc(it.qty) + '</td>' +
+      '<td style="padding:10px 16px;border-bottom:1px solid #f0f0f0;font-size:14px;color:#111;text-align:right">' + esc(it.price) + '</td>' +
       '</tr>'
     );
   }).join("");
@@ -70,10 +73,10 @@ function buildHtml(o) {
     '<div style="background:#fafafa;border:1px solid #eee;border-radius:10px;padding:16px 20px">' +
     '<p style="margin:0 0 10px;font-size:11px;font-weight:700;color:#888;letter-spacing:1px;text-transform:uppercase">Cliente</p>' +
     '<table width="100%" cellpadding="0" cellspacing="0">' +
-    '<tr><td style="font-size:14px;font-weight:600;color:#111;padding-bottom:4px">' + o.customer.name + '</td></tr>' +
-    '<tr><td style="font-size:13px;color:#555;padding-bottom:2px">📞 ' + o.customer.phone + '</td></tr>' +
-    (o.customer.email ? '<tr><td style="font-size:13px;color:#555;padding-bottom:2px">✉️ ' + o.customer.email + '</td></tr>' : '') +
-    (o.customer.cpf ? '<tr><td style="font-size:13px;color:#555">CPF ' + o.customer.cpf + '</td></tr>' : '') +
+    '<tr><td style="font-size:14px;font-weight:600;color:#111;padding-bottom:4px">' + esc(o.customer.name) + '</td></tr>' +
+    '<tr><td style="font-size:13px;color:#555;padding-bottom:2px">📞 ' + esc(o.customer.phone) + '</td></tr>' +
+    (o.customer.email ? '<tr><td style="font-size:13px;color:#555;padding-bottom:2px">✉️ ' + esc(o.customer.email) + '</td></tr>' : '') +
+    (o.customer.cpf ? '<tr><td style="font-size:13px;color:#555">CPF ' + esc(o.customer.cpf) + '</td></tr>' : '') +
     '</table></div></td></tr>' +
 
     /* produtos */
