@@ -1,14 +1,6 @@
-/* ÓTICAS RELUX — Cálculo de frete via Melhor Envio
-   Variável de ambiente obrigatória: ME_TOKEN (token de produção ou sandbox do Melhor Envio)
-   Variável opcional: ME_CEP_ORIGEM (CEP da loja sem traço, padrão 01310100)
-   Variável opcional: ME_SANDBOX (qualquer valor = usa sandbox) */
-
-const ME_API_PROD    = "https://melhorenvio.com.br/api/v2/me/shipment/calculate";
-const ME_API_SANDBOX = "https://sandbox.melhorenvio.com.br/api/v2/me/shipment/calculate";
-
-/* Dimensões-padrão de uma embalagem de óculos/lentes (cm / kg).
-   Ajuste conforme suas embalagens reais. */
-const BOX = { height: 5, width: 17, length: 12, weight: 0.3 };
+/* Óticas Relux — Frete fixo por região (origem: Porto Alegre/RS)
+   Valores com margem de segurança — loja nunca sai no prejuízo.
+   Frete grátis automático para pedidos acima de R$ 300. */
 
 function cors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -16,82 +8,50 @@ function cors(res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
+/* Mapeamento de faixas de CEP → região */
+function cepToRegion(cep) {
+  var n = parseInt(String(cep).replace(/\D/g, "").padStart(8, "0").slice(0, 5), 10);
+  if (n >= 1000  && n <= 39999) return "sudeste";    // SP, RJ, ES, MG
+  if (n >= 40000 && n <= 65999) return "nordeste";   // BA, SE, PE, AL, PB, RN, CE, PI, MA
+  if (n >= 66000 && n <= 69999) return "norte";      // PA, AM, RR, AC, AP
+  if (n >= 70000 && n <= 72999) return "centroeste"; // DF
+  if (n >= 73000 && n <= 76999) return "centroeste"; // GO
+  if (n >= 77000 && n <= 77999) return "norte";      // TO
+  if (n >= 78000 && n <= 79999) return "centroeste"; // MT, MS
+  if (n >= 80000 && n <= 99999) return "sul";        // PR, SC, RS
+  return "sul";
+}
+
+/* Tabela de preços — margem ~40% acima do custo real dos Correios.
+   Prazo em dias úteis a partir de Porto Alegre/RS. */
+var TABELA = {
+  sul:        { pac: { preco: 26.90, dias: 7  }, sedex: { preco: 44.90, dias: 2 } },
+  sudeste:    { pac: { preco: 34.90, dias: 9  }, sedex: { preco: 59.90, dias: 3 } },
+  centroeste: { pac: { preco: 39.90, dias: 11 }, sedex: { preco: 67.90, dias: 4 } },
+  nordeste:   { pac: { preco: 44.90, dias: 13 }, sedex: { preco: 74.90, dias: 5 } },
+  norte:      { pac: { preco: 49.90, dias: 16 }, sedex: { preco: 84.90, dias: 6 } },
+};
+
 module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Método não permitido" });
 
-  const TOKEN = process.env.ME_TOKEN;
-  if (!TOKEN) return res.status(500).json({ error: "ME_TOKEN não configurado no servidor." });
-
-  let body;
+  var body;
   try { body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {}); }
   catch (e) { return res.status(400).json({ error: "JSON inválido" }); }
 
-  const { cep_destino, qtd } = body;
-  const cepDestino = String(cep_destino || "").replace(/\D/g, "");
-  if (cepDestino.length !== 8) return res.status(400).json({ error: "CEP inválido" });
+  var cep = String(body.cep_destino || "").replace(/\D/g, "");
+  if (cep.length !== 8) return res.status(400).json({ error: "CEP inválido" });
 
-  const cepOrigem = String(process.env.ME_CEP_ORIGEM || "01310100").replace(/\D/g, "");
-  const quantidade = Math.max(1, parseInt(qtd) || 1);
+  var regiao = cepToRegion(cep);
+  var t = TABELA[regiao] || TABELA.sul;
 
-  /* Escala a embalagem proporcionalmente à quantidade de itens */
-  const pkg = {
-    height: BOX.height,
-    width:  BOX.width,
-    length: Math.min(BOX.length * quantidade, 60), // máx 60 cm
-    weight: Math.min(parseFloat((BOX.weight * quantidade).toFixed(2)), 30), // máx 30 kg
-  };
-
-  const payload = {
-    from:     { postal_code: cepOrigem },
-    to:       { postal_code: cepDestino },
-    package:  pkg,
-    options:  { receipt: false, own_hand: false },
-    services: "1,2", // 1 = PAC · 2 = SEDEX
-  };
-
-  const endpoint = process.env.ME_SANDBOX ? ME_API_SANDBOX : ME_API_PROD;
-
-  try {
-    const r = await fetch(endpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type":  "application/json",
-        "Accept":        "application/json",
-        "Authorization": "Bearer " + TOKEN,
-        /* O Melhor Envio exige User-Agent com nome do app + e-mail — obrigatório */
-        "User-Agent":    "Óticas Relux (contato@oticasrelux.com.br)",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await r.json();
-
-    if (!r.ok) {
-      return res.status(r.status).json({ error: "Erro no Melhor Envio", detail: data });
-    }
-
-    /* Filtra apenas serviços sem erro e mapeia para o formato do front-end */
-    const opcoes = (Array.isArray(data) ? data : [])
-      .filter(function (s) { return !s.error && s.price; })
-      .map(function (s) {
-        return {
-          id:          s.id,
-          nome:        s.name,                    // "PAC" | "SEDEX"
-          empresa:     s.company && s.company.name, // "Correios"
-          preco:       parseFloat(s.price),
-          dias:        s.delivery_time,           // número de dias úteis
-          currency:    s.currency || "R$",
-        };
-      });
-
-    if (!opcoes.length) {
-      return res.status(422).json({ error: "Nenhuma opção de frete disponível para este CEP." });
-    }
-
-    return res.status(200).json({ opcoes });
-  } catch (e) {
-    return res.status(500).json({ error: "Falha ao comunicar com o Melhor Envio" });
-  }
+  return res.status(200).json({
+    opcoes: [
+      { id: "pac",   nome: "PAC",   empresa: "Correios", preco: t.pac.preco,   dias: t.pac.dias   },
+      { id: "sedex", nome: "SEDEX", empresa: "Correios", preco: t.sedex.preco, dias: t.sedex.dias },
+    ],
+    regiao: regiao,
+  });
 };

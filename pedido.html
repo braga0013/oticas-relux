@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acompanhar Pedido — Óticas Relux</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" href="assets/img/logo.svg" type="image/svg+xml" />
+  <style>
+    .track-wrap { min-height: 100vh; padding: 48px 0 80px; }
+    .track-card { background: var(--bg-2); border: 1px solid var(--hair); border-radius: var(--r-lg); padding: 32px; max-width: 600px; margin: 0 auto; }
+    .track-card h1 { font-size: 1.3rem; margin-bottom: 4px; }
+    .track-card .num { color: var(--gold-deep); font-weight: 700; }
+
+    /* Busca */
+    .search-box { display: flex; gap: 10px; margin-bottom: 28px; }
+    .search-box input { flex: 1; padding: 12px 16px; border: 1px solid var(--hair); border-radius: var(--r-sm); background: var(--bg); color: var(--ink); font-family: inherit; font-size: .95rem; }
+    .search-box input:focus { outline: 2px solid var(--gold); }
+
+    /* Timeline de status */
+    .timeline { margin: 24px 0; }
+    .tl-step { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 20px; position: relative; }
+    .tl-step:not(:last-child)::before { content: ""; position: absolute; left: 15px; top: 32px; bottom: 0; width: 2px; background: var(--hair); }
+    .tl-dot { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--hair); background: var(--bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: .85rem; color: var(--muted); }
+    .tl-dot.done { background: #22c55e; border-color: #22c55e; color: #fff; }
+    .tl-dot.current { background: var(--gold); border-color: var(--gold); color: #000; }
+    .tl-info { padding-top: 4px; }
+    .tl-label { font-weight: 600; font-size: .9rem; }
+    .tl-label.done { color: #16a34a; }
+    .tl-label.current { color: var(--gold-deep); }
+    .tl-label.pending { color: var(--muted); }
+    .tl-sub { font-size: .8rem; color: var(--muted); margin-top: 2px; }
+
+    /* Rastreio */
+    .tracking-box { background: var(--surface-2); border-radius: var(--r-md); padding: 20px; margin: 20px 0; text-align: center; }
+    .tracking-code { font-size: 1.5rem; font-weight: 700; letter-spacing: 3px; color: var(--ink); margin: 8px 0; }
+    .tracking-method { font-size: .8rem; color: var(--muted); margin-bottom: 14px; }
+
+    /* Resumo */
+    .order-section { margin-top: 24px; border-top: 1px solid var(--hair); padding-top: 20px; }
+    .order-section h3 { font-size: .78rem; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: .06em; margin-bottom: 12px; }
+    .order-item { display: flex; justify-content: space-between; font-size: .88rem; padding: 5px 0; border-bottom: 1px solid var(--hair-soft); }
+    .order-item:last-child { border-bottom: none; }
+    .order-total { display: flex; justify-content: space-between; font-weight: 700; font-size: .95rem; padding-top: 10px; }
+
+    /* Estado vazio / erro */
+    .track-empty { text-align: center; padding: 40px 0; color: var(--muted); }
+    .track-empty svg { margin-bottom: 12px; }
+
+    /* Busca inicial */
+    .search-wrap { max-width: 500px; margin: 0 auto; text-align: center; padding: 48px 24px; }
+    .search-wrap h2 { margin-bottom: 8px; }
+    .search-wrap p { color: var(--muted); margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <a class="nav-logo" href="index.html">
+        <img src="assets/img/logo.svg" alt="Óticas Relux" width="36" height="36" />
+        <span>Óticas <strong>Relux</strong></span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="track-wrap">
+    <div class="container">
+
+      <!-- Formulário de busca inicial -->
+      <div id="searchWrap" class="search-wrap">
+        <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true" style="margin-bottom:16px">
+          <rect x="4" y="8" width="40" height="32" rx="4" fill="none" stroke="var(--gold)" stroke-width="3"/>
+          <path d="M14 20h20M14 28h12" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <h2>Acompanhar pedido</h2>
+        <p>Digite o número do seu pedido para ver o status e o código de rastreio.</p>
+        <div class="search-box">
+          <input id="searchInput" type="text" placeholder="RLX-123456" autocomplete="off" />
+          <button class="btn btn-primary" id="searchBtn">Buscar</button>
+        </div>
+        <p id="searchErr" style="color:#ef4444;font-size:.85rem;display:none">Pedido não encontrado. Verifique o número e tente novamente.</p>
+      </div>
+
+      <!-- Resultado -->
+      <div id="resultWrap" class="track-card" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+          <div>
+            <h1>Pedido <span class="num" id="rNum"></span></h1>
+            <p id="rDate" style="color:var(--muted);font-size:.85rem;margin:2px 0 0"></p>
+          </div>
+          <button class="btn btn-ghost" id="newSearchBtn" style="font-size:.82rem">Buscar outro</button>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline" id="timeline"></div>
+
+        <!-- Rastreio (só aparece quando enviado) -->
+        <div id="trackingBox" class="tracking-box" style="display:none">
+          <p style="font-size:.78rem;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.06em;margin:0 0 4px">Código de rastreio</p>
+          <div class="tracking-code" id="trackCode"></div>
+          <div class="tracking-method" id="trackMethod"></div>
+          <a id="trackLink" href="#" target="_blank" rel="noopener" class="btn btn-primary" style="display:inline-flex">Rastrear nos Correios →</a>
+        </div>
+
+        <!-- Resumo do pedido -->
+        <div class="order-section">
+          <h3>Produtos</h3>
+          <div id="rItems"></div>
+          <div class="order-total">
+            <span>Total</span>
+            <span id="rTotal"></span>
+          </div>
+        </div>
+
+        <!-- Endereço -->
+        <div id="rAddrSection" class="order-section">
+          <h3>Entrega</h3>
+          <p id="rAddr" style="font-size:.88rem;color:var(--muted);margin:0"></p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var STATUS_STEPS = [
+      { key: "aguardando_pagamento", label: "Aguardando pagamento", icon: "💳" },
+      { key: "pago",                 label: "Pagamento confirmado", icon: "✓" },
+      { key: "em_preparo",           label: "Em preparação",        icon: "📦" },
+      { key: "enviado",              label: "Enviado",              icon: "🚚" },
+      { key: "entregue",             label: "Entregue",             icon: "🏠" },
+    ];
+    var ORDER_STEPS = STATUS_STEPS.map(function (s) { return s.key; });
+
+    function el(id) { return document.getElementById(id); }
+    function fmtDate(d) { return new Date(d).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" }); }
+    function fmtBRL(n) { return "R$ " + Number(n).toFixed(2).replace(".", ","); }
+
+    function getNumeroFromURL() {
+      var params = new URLSearchParams(location.search);
+      return params.get("numero") || params.get("id") || "";
+    }
+
+    function renderTimeline(status) {
+      var currentIdx = ORDER_STEPS.indexOf(status);
+      if (status === "cancelado") {
+        el("timeline").innerHTML = '<div class="tl-step"><div class="tl-dot" style="background:#ef4444;border-color:#ef4444;color:#fff">✕</div><div class="tl-info"><div class="tl-label" style="color:#ef4444">Pedido cancelado</div></div></div>';
+        return;
+      }
+      el("timeline").innerHTML = STATUS_STEPS.map(function (s, i) {
+        var isDone = i < currentIdx;
+        var isCurrent = i === currentIdx;
+        var cls = isDone ? "done" : isCurrent ? "current" : "";
+        return '<div class="tl-step">' +
+          '<div class="tl-dot ' + cls + '">' + (isDone ? "✓" : s.icon) + '</div>' +
+          '<div class="tl-info">' +
+          '<div class="tl-label ' + (isDone ? "done" : isCurrent ? "current" : "pending") + '">' + s.label + '</div>' +
+          '</div></div>';
+      }).join("");
+    }
+
+    function renderResult(p) {
+      el("rNum").textContent = p.numero;
+      el("rDate").textContent = "Realizado em " + fmtDate(p.created_at);
+      renderTimeline(p.status);
+
+      if (p.tracking_code) {
+        el("trackCode").textContent = p.tracking_code;
+        el("trackMethod").textContent = (p.shipping_method || "PAC") + " — Correios";
+        el("trackLink").href = "https://rastreamento.correios.com.br/objeto/" + p.tracking_code;
+        el("trackingBox").style.display = "";
+      } else {
+        el("trackingBox").style.display = "none";
+      }
+
+      var its = Array.isArray(p.items) ? p.items : [];
+      el("rItems").innerHTML = its.map(function (it) {
+        return '<div class="order-item"><span>' + (it.name || it.id) + (it.qty > 1 ? " × " + it.qty : "") + '</span><span>' + fmtBRL((it.price || 0) * (it.qty || 1)) + '</span></div>';
+      }).join("") || '<p style="color:var(--muted);font-size:.85rem">—</p>';
+
+      el("rTotal").textContent = fmtBRL(p.total);
+
+      var addrSection = el("rAddrSection");
+      if (p.delivery_type === "loja") {
+        el("rAddr").textContent = "Retirada na loja";
+      } else if (p.shipping_address && p.shipping_address.rua) {
+        var a = p.shipping_address;
+        el("rAddr").textContent = a.rua + ", " + a.numero + (a.comp ? " (" + a.comp + ")" : "") + " — " + a.bairro + ", " + a.cidade + "/" + a.uf + " — CEP " + a.cep;
+      } else {
+        addrSection.style.display = "none";
+      }
+
+      el("searchWrap").style.display = "none";
+      el("resultWrap").style.display = "";
+    }
+
+    function buscar(numero) {
+      numero = (numero || "").trim().toUpperCase();
+      if (!numero) return;
+      el("searchBtn").disabled = true;
+      el("searchBtn").textContent = "Buscando...";
+      el("searchErr").style.display = "none";
+
+      fetch("/api/pedido?numero=" + encodeURIComponent(numero))
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          el("searchBtn").disabled = false;
+          el("searchBtn").textContent = "Buscar";
+          if (d.error) { el("searchErr").style.display = ""; return; }
+          history.pushState({}, "", "?numero=" + encodeURIComponent(numero));
+          renderResult(d);
+        })
+        .catch(function () {
+          el("searchBtn").disabled = false;
+          el("searchBtn").textContent = "Buscar";
+          el("searchErr").style.display = "";
+        });
+    }
+
+    el("searchBtn").addEventListener("click", function () { buscar(el("searchInput").value); });
+    el("searchInput").addEventListener("keydown", function (e) { if (e.key === "Enter") buscar(this.value); });
+    el("newSearchBtn").addEventListener("click", function () {
+      el("resultWrap").style.display = "none";
+      el("searchWrap").style.display = "";
+      el("searchInput").value = "";
+      history.pushState({}, "", "pedido.html");
+    });
+
+    /* Auto-busca se vier número na URL */
+    var n = getNumeroFromURL();
+    if (n) { el("searchInput").value = n; buscar(n); }
+  })();
+  </script>
+</body>
+</html>

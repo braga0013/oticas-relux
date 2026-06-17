@@ -314,7 +314,7 @@
           pix.innerHTML = "<b>Boleto gerado</b><br>" + (res.ticket_url ? '<a href="' + res.ticket_url + '" target="_blank" rel="noopener">Abrir / imprimir boleto</a>' : "Link indisponível") + "<br><br><b>Total: " + fmt(o.total) + "</b>";
           el("csMsg").textContent = "Pague o boleto para confirmar (compensa em até 2 dias úteis).";
         }
-        saveOrder(o, "pendente");
+        saveOrder(o, "pendente", res.id);
         sendOrderEmail(o, "pendente");
         openSuccess();
         if (R.clearCart) R.clearCart();
@@ -376,7 +376,7 @@
         el("csMsg").textContent = "Não aprovado — verifique os dados ou tente outro cartão.";
       }
       var orderStatus = res.status === "approved" ? "aprovado" : "pendente";
-      if (res.status !== "rejected") { saveOrder(o, orderStatus); sendOrderEmail(o, orderStatus); }
+      if (res.status !== "rejected") { saveOrder(o, orderStatus, res.id); sendOrderEmail(o, orderStatus); }
       openSuccess();
       if (res.status === "approved" && R.clearCart) R.clearCart();
     }).catch(function (err) {
@@ -433,9 +433,43 @@
     } catch (e) {}
   }
 
-  function saveOrder(o, status) {
+  function saveOrder(o, status, paymentId) {
+    var apiBase = (window.RELUX_CONFIG && window.RELUX_CONFIG.apiBase) || "";
+    var its = items().map(function (it) {
+      return { id: it.p.id, name: it.p.name, brand: it.p.brand || "", qty: it.qty, price: parseBRL(it.p.price) };
+    });
+    fetch(apiBase + "/api/pedido", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action:           "create",
+        numero:           o.num,
+        customer_name:    val("nome"),
+        customer_email:   val("email") || null,
+        customer_phone:   onlyDigits(val("tel")),
+        customer_cpf:     onlyDigits(val("cpf")) || null,
+        items:            its,
+        subtotal:         o.sub,
+        discount:         o.disc,
+        total:            o.total,
+        delivery_type:    delivery(),
+        shipping_method:  freteMethod(),
+        shipping_price:   o.frete,
+        shipping_cep:     onlyDigits(val("cep")) || null,
+        shipping_address: delivery() === "casa" ? {
+          rua: val("rua"), numero: val("numero"), comp: val("comp"),
+          bairro: val("bairro"), cidade: val("cidade"), uf: val("uf"), cep: val("cep")
+        } : null,
+        payment_method:   o.pm,
+        payment_id:       paymentId || null,
+        payment_status:   status === "aprovado" ? "approved" : "pending",
+        status:           status === "aprovado" ? "pago" : "aguardando_pagamento",
+      }),
+    }).catch(function () {});
+
+    /* mantém cópia local para dashboard.html */
     var u = window.RELUX_AUTH && window.RELUX_AUTH.current();
-    var rec = { num: o.num, total: fmt(o.total), qtd: items().reduce(function (s, it) { return s + it.qty; }, 0), date: new Date().toLocaleDateString("pt-BR"), status: status || "pendente", email: u ? u.email : "guest" };
+    var rec = { num: o.num, total: fmt(o.total), qtd: its.reduce(function (s, i) { return s + i.qty; }, 0), date: new Date().toLocaleDateString("pt-BR"), status: status || "pendente", email: u ? u.email : "guest" };
     var all; try { all = JSON.parse(localStorage.getItem("relux-orders")) || []; } catch (e) { all = []; }
     all.push(rec); try { localStorage.setItem("relux-orders", JSON.stringify(all)); } catch (e) {}
   }

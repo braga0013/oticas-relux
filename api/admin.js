@@ -102,6 +102,83 @@ export default async function handler(req, res) {
       return res.status(uploadRes.status).json({ error: err });
     }
 
+    /* ── Listar pedidos ── */
+    if (action === "orders") {
+      var since = body.since ? "&created_at=gte." + encodeURIComponent(body.since) : "";
+      var statusFilter = body.status ? "&status=eq." + encodeURIComponent(body.status) : "";
+      var r = await sb("/rest/v1/pedidos?select=*&order=created_at.desc&limit=200" + since + statusFilter, "GET");
+      return res.json(r.data || []);
+    }
+
+    /* ── Atualizar pedido (status, notas, etc.) ── */
+    if (action === "order-update") {
+      if (!body.numero) return res.status(400).json({ error: "numero é obrigatório." });
+      var r = await sb(
+        "/rest/v1/pedidos?numero=eq." + encodeURIComponent(body.numero),
+        "PATCH", body.data, { Prefer: "return=representation" }
+      );
+      if (!r.ok) return res.status(r.status).json(r.data);
+      return res.json({ ok: true });
+    }
+
+    /* ── Enviar rastreio ao cliente ── */
+    if (action === "send-tracking") {
+      if (!body.numero || !body.tracking_code) {
+        return res.status(400).json({ error: "numero e tracking_code são obrigatórios." });
+      }
+      /* 1. Busca pedido */
+      var pr = await sb("/rest/v1/pedidos?numero=eq." + encodeURIComponent(body.numero) + "&select=*", "GET");
+      if (!pr.ok || !pr.data || !pr.data.length) return res.status(404).json({ error: "Pedido não encontrado." });
+      var pedido = pr.data[0];
+
+      /* 2. Atualiza no banco */
+      await sb(
+        "/rest/v1/pedidos?numero=eq." + encodeURIComponent(body.numero),
+        "PATCH",
+        { tracking_code: body.tracking_code, tracking_sent_at: new Date().toISOString(), status: "enviado" }
+      );
+
+      /* 3. Envia e-mail para o cliente */
+      var RESEND_KEY = process.env.RESEND_API_KEY;
+      if (RESEND_KEY && pedido.customer_email) {
+        var correiosUrl = "https://rastreamento.correios.com.br/objeto/" + body.tracking_code;
+        var trackHtml =
+          '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Pedido enviado</title></head>' +
+          '<body style="margin:0;padding:0;background:#f5f5f5;font-family:\'Helvetica Neue\',sans-serif">' +
+          '<table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 0"><tr><td align="center">' +
+          '<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">' +
+          '<tr><td style="background:#0a0a0a;border-radius:12px 12px 0 0;padding:24px 32px">' +
+          '<span style="font-size:20px;font-weight:800;color:#fff">ÓTICAS RELUX</span></td></tr>' +
+          '<tr><td style="background:#fff;padding:32px">' +
+          '<p style="font-size:22px;font-weight:700;color:#0a0a0a;margin:0 0 8px">Seu pedido foi enviado! 📦</p>' +
+          '<p style="color:#555;margin:0 0 24px">Olá, ' + (pedido.customer_name || "cliente") + '! Seu pedido <strong>' + body.numero + '</strong> saiu para entrega.</p>' +
+          '<div style="background:#fafafa;border:1px solid #eee;border-radius:10px;padding:20px;margin-bottom:24px">' +
+          '<p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px">Código de rastreio</p>' +
+          '<p style="margin:0;font-size:22px;font-weight:700;color:#0a0a0a;letter-spacing:2px">' + body.tracking_code + '</p>' +
+          '<p style="margin:8px 0 0;font-size:13px;color:#888">Modalidade: ' + (pedido.shipping_method || "PAC") + ' — Correios</p>' +
+          '</div>' +
+          '<a href="' + correiosUrl + '" style="display:inline-block;background:#d97706;color:#000;padding:14px 28px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:24px">Rastrear meu pedido →</a>' +
+          '<p style="color:#888;font-size:13px;margin:0">Ou acesse: <a href="' + correiosUrl + '" style="color:#d97706">' + correiosUrl + '</a></p>' +
+          '</td></tr>' +
+          '<tr><td style="background:#0a0a0a;border-radius:0 0 12px 12px;padding:16px 32px;text-align:center">' +
+          '<p style="margin:0;font-size:12px;color:#888">Dúvidas? Fale conosco pelo WhatsApp.</p>' +
+          '</td></tr></table></td></tr></table></body></html>';
+
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: "Bearer " + RESEND_KEY },
+          body: JSON.stringify({
+            from: "Óticas Relux <onboarding@resend.dev>",
+            to: [pedido.customer_email],
+            subject: "Seu pedido " + body.numero + " foi enviado! 📦",
+            html: trackHtml,
+          }),
+        });
+      }
+
+      return res.json({ ok: true, email_sent: !!(RESEND_KEY && pedido.customer_email) });
+    }
+
     return res.status(400).json({ error: "Ação desconhecida: " + action });
   } catch (e) {
     return res.status(500).json({ error: String(e.message || e) });
