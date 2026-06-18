@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin-pedidos.html
+Disallow: /admin-produtos.html
+Disallow: /api/
+
+Sitemap: https://oticasrelux.com.br/sitemap.xml
