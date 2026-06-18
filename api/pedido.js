@@ -38,7 +38,7 @@ module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  /* ── PATCH: atualiza status do pedido (confirmação de pagamento) ── */
+  /* ── PATCH: atualiza status do pedido (confirmação de pagamento / cancelamento) ── */
   if (req.method === "PATCH") {
     var pb;
     try { pb = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {}); }
@@ -47,6 +47,29 @@ module.exports = async function handler(req, res) {
     if (!pb.numero || !allowed.includes(pb.status)) return res.status(400).json({ error: "numero/status inválidos" });
     var patch = { status: pb.status };
     if (pb.status === "pago") patch.payment_status = "approved";
+    if (pb.status === "cancelado") patch.payment_status = "cancelled";
+
+    /* se cancelando, busca payment_id para cancelar no Asaas também */
+    if (pb.status === "cancelado") {
+      var pedidoR = await sbFetch(
+        "/rest/v1/pedidos?numero=eq." + encodeURIComponent(pb.numero) + "&select=payment_id",
+        "GET", null, true
+      );
+      var paymentId = pedidoR.data && pedidoR.data[0] && pedidoR.data[0].payment_id;
+      if (paymentId) {
+        var asaasKey = process.env.ASAAS_API_KEY;
+        var asaasBase = process.env.ASAAS_SANDBOX
+          ? "https://sandbox.asaas.com/api/v3"
+          : "https://api.asaas.com/v3";
+        try {
+          await fetch(asaasBase + "/payments/" + paymentId + "/cancel", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", access_token: asaasKey },
+          });
+        } catch (_) { /* ignora erro no Asaas — cancela no Supabase de qualquer forma */ }
+      }
+    }
+
     var pr = await sbFetch("/rest/v1/pedidos?numero=eq." + encodeURIComponent(pb.numero), "PATCH", patch, true);
     if (!pr.ok) return res.status(pr.status).json({ error: "Erro ao atualizar pedido", detail: pr.data });
     return res.json({ ok: true });
