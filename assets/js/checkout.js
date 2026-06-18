@@ -49,11 +49,13 @@
   }
 
   /* ---------- parcelas do cartão ---------- */
+  var MIN_PARC = 5; // mínimo por parcela (Asaas)
   function fillInstallments() {
     var sel = el("ccparc"); if (!sel) return;
     var total = subtotal() + freteAtual;
     var html = "";
     for (var n = 1; n <= 10; n++) {
+      if (total / n < MIN_PARC && n > 1) break;
       html += '<option value="' + n + '">' + n + "x de " + fmt(total / n) + " sem juros</option>";
     }
     sel.innerHTML = html;
@@ -397,7 +399,7 @@
     }).then(function (res) {
       setProcessing(false);
       el("csOrder").textContent = "Nº " + o.num;
-      el("csWhats").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(orderMessage(o));
+      el("csWhats").hidden = true;
       el("csPix").hidden = true;
       var h = document.querySelector(".cs-card h2");
       if (res.status === "approved") {
