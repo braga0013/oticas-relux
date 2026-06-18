@@ -288,7 +288,6 @@
       el("drawerTitle").textContent = "Pedido " + p.numero;
 
       var its = Array.isArray(p.items) ? p.items : (typeof p.items === "string" ? JSON.parse(p.items) : []);
-      console.log("DEBUG items", p.numero, p.items, "its:", its);
       var addr = p.shipping_address;
       var addrStr = p.delivery_type==="loja" ? "Retirada na loja" :
         (addr ? addr.rua+", "+addr.numero+(addr.comp?" ("+addr.comp+")":"")+"\n"+addr.bairro+", "+addr.cidade+"/"+addr.uf+" — CEP "+addr.cep : "—");
