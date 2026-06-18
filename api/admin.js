@@ -129,6 +129,56 @@ export default async function handler(req, res) {
         "PATCH", body.data, { Prefer: "return=representation" }
       );
       if (!r.ok) return res.status(r.status).json(r.data);
+
+      /* envia e-mail ao cliente conforme o novo status */
+      var newStatus = body.data && body.data.status;
+      var STATUS_EMAILS = {
+        em_preparo: { emoji: "🔧", titulo: "Seu pedido está sendo preparado!", msg: "Estamos separando e conferindo cada item com cuidado. Em breve será enviado." },
+        enviado:    { emoji: "📦", titulo: "Seu pedido foi enviado!", msg: "Seu pedido está a caminho. Assim que tivermos o código de rastreio, te avisamos." },
+        entregue:   { emoji: "✅", titulo: "Pedido entregue!", msg: "Seu pedido foi entregue. Esperamos que você aproveite muito! Qualquer dúvida, estamos aqui." },
+        cancelado:  { emoji: "❌", titulo: "Pedido cancelado", msg: "Seu pedido foi cancelado. Se tiver alguma dúvida ou quiser fazer um novo pedido, fale conosco." },
+      };
+      var emailCfg = STATUS_EMAILS[newStatus];
+      var RESEND_KEY = process.env.RESEND_API_KEY;
+      if (emailCfg && RESEND_KEY) {
+        /* busca dados do cliente */
+        var pedR = await sb("/rest/v1/pedidos?numero=eq." + encodeURIComponent(body.numero) + "&select=customer_name,customer_email,total", "GET");
+        var ped = pedR.data && pedR.data[0];
+        if (ped && ped.customer_email) {
+          var statusHtml =
+            '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Atualização do pedido</title></head>' +
+            '<body style="margin:0;padding:0;background:#f5f5f5;font-family:\'Helvetica Neue\',sans-serif">' +
+            '<table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 0"><tr><td align="center">' +
+            '<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">' +
+            '<tr><td style="background:#0a0a0a;border-radius:12px 12px 0 0;padding:24px 32px">' +
+            '<span style="font-size:20px;font-weight:800;color:#fff">ÓTICAS RELUX</span></td></tr>' +
+            '<tr><td style="background:#fff;padding:32px">' +
+            '<p style="font-size:24px;margin:0 0 8px">' + emailCfg.emoji + '</p>' +
+            '<p style="font-size:22px;font-weight:700;color:#0a0a0a;margin:0 0 8px">' + emailCfg.titulo + '</p>' +
+            '<p style="color:#555;margin:0 0 24px">Olá, ' + (ped.customer_name || "cliente") + '! ' + emailCfg.msg + '</p>' +
+            '<div style="background:#fafafa;border:1px solid #eee;border-radius:10px;padding:16px 20px;margin-bottom:24px">' +
+            '<p style="margin:0;font-size:13px;color:#888">Pedido <strong style="color:#0a0a0a">' + body.numero + '</strong></p>' +
+            '</div>' +
+            '<a href="https://oticasrelux.com.br/pedido.html?numero=' + encodeURIComponent(body.numero) + '" ' +
+            'style="display:inline-block;background:#d97706;color:#000;padding:14px 28px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none">Ver meu pedido →</a>' +
+            '</td></tr>' +
+            '<tr><td style="background:#0a0a0a;border-radius:0 0 12px 12px;padding:16px 32px;text-align:center">' +
+            '<p style="margin:0;font-size:12px;color:#888">Dúvidas? Entre em contato pelo WhatsApp.</p>' +
+            '</td></tr></table></td></tr></table></body></html>';
+
+          fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + RESEND_KEY },
+            body: JSON.stringify({
+              from: "Óticas Relux <onboarding@resend.dev>",
+              to: [ped.customer_email],
+              subject: emailCfg.emoji + " Pedido " + body.numero + " — " + emailCfg.titulo,
+              html: statusHtml,
+            }),
+          }).catch(function() {});
+        }
+      }
+
       return res.json({ ok: true });
     }
 
