@@ -321,7 +321,15 @@
         openSuccess();
         if (R.clearCart) R.clearCart();
       })
-      .catch(function (err) { showError(err && err.error); });
+      .catch(function (err) {
+        setProcessing(false);
+        var msg = (err && err.error) || "";
+        /* se a chave Asaas não está configurada, redireciona para WhatsApp */
+        if (msg.indexOf("não configurado") !== -1 || msg.indexOf("ASAAS") !== -1) {
+          return finalizeWhatsApp(o);
+        }
+        showError(msg);
+      });
   }
 
   function pollStatus(id) {
@@ -382,7 +390,12 @@
       openSuccess();
       if (res.status === "approved" && R.clearCart) R.clearCart();
     }).catch(function (err) {
-      showError((err && err.error) || "Não foi possível processar o pagamento. Confira os dados e tente novamente.");
+      setProcessing(false);
+      var msg = (err && err.error) || "";
+      if (msg.indexOf("não configurado") !== -1 || msg.indexOf("ASAAS") !== -1) {
+        return finalizeWhatsApp(o);
+      }
+      showError(msg || "Não foi possível processar o pagamento. Confira os dados e tente novamente.");
     });
   }
 
