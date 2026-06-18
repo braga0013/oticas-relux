@@ -271,7 +271,7 @@
           '<td><strong>'+fmtBRL(p.total||0)+'</strong></td>' +
           '<td>'+(PAY_LABEL[p.payment_method]||p.payment_method||"—")+'</td>' +
           '<td>'+(p.delivery_type==="loja"?"Retirada":(p.shipping_method||"Entrega"))+'</td>' +
-          '<td><span class="status-badge s-'+p.status+'">'+(STATUS_LABEL[p.status]||p.status)+'</span></td>' +
+          '<td><span class="status-badge s-'+p.status+'">'+((p.status==="enviado"&&p.delivery_type==="loja")?"Pronto retirada":(STATUS_LABEL[p.status]||p.status))+'</span></td>' +
           '<td><button class="btn-detail" data-num="'+p.numero+'">Abrir</button></td>' +
           '</tr>';
       }).join("");
@@ -325,17 +325,23 @@
         '<div style="margin-bottom:12px"><span style="font-size:.8rem;color:var(--muted)">Status atual:</span>' +
         '<select class="status-select" id="statusSel">' +
         ['aguardando_pagamento','pago','em_preparo','enviado','entregue','cancelado'].map(function(s){
-          return '<option value="'+s+'"'+(p.status===s?' selected':'')+'>'+STATUS_LABEL[s]+'</option>';
+          var label = (s==='enviado' && p.delivery_type==='loja') ? 'Pronto para retirada' : STATUS_LABEL[s];
+          return '<option value="'+s+'"'+(p.status===s?' selected':'')+'>'+label+'</option>';
         }).join("") + '</select>' +
         '<button class="btn btn-primary" id="saveStatusBtn" style="margin-top:8px;width:100%;justify-content:center">Salvar status</button></div>' +
 
-        '<p class="dsec">Código de Rastreio</p>' +
-        (p.tracking_code ? '<div class="drow" style="margin-bottom:8px"><span>Código atual</span><strong style="letter-spacing:2px">'+p.tracking_code+'</strong></div>' : '') +
-        '<div class="track-form">' +
-        '<input id="trackInput" placeholder="Ex: BR123456789BR" value="'+(p.tracking_code||"")+'" />' +
-        '<button class="btn btn-primary" id="sendTrackBtn">Enviar ao cliente</button>' +
-        '</div>' +
-        '<p style="font-size:.76rem;color:var(--muted);margin-top:6px">Ao clicar, o status muda para "Enviado" e o cliente recebe um e-mail automático com o código.</p>';
+        (p.delivery_type === 'loja'
+          ? '<p class="dsec">Aviso de Retirada</p>' +
+            '<p style="font-size:.82rem;color:var(--muted);margin:0 0 10px">Ao clicar, o status muda para "Pronto para retirada" e o cliente recebe um e-mail avisando que pode buscar o pedido.</p>' +
+            '<button class="btn btn-primary" id="notifyPickupBtn" style="width:100%;justify-content:center">🏪 Avisar cliente — pedido pronto</button>'
+          : '<p class="dsec">Código de Rastreio</p>' +
+            (p.tracking_code ? '<div class="drow" style="margin-bottom:8px"><span>Código atual</span><strong style="letter-spacing:2px">'+p.tracking_code+'</strong></div>' : '') +
+            '<div class="track-form">' +
+            '<input id="trackInput" placeholder="Ex: BR123456789BR" value="'+(p.tracking_code||"")+'" />' +
+            '<button class="btn btn-primary" id="sendTrackBtn">Enviar ao cliente</button>' +
+            '</div>' +
+            '<p style="font-size:.76rem;color:var(--muted);margin-top:6px">Ao clicar, o status muda para "Enviado" e o cliente recebe um e-mail automático com o código.</p>'
+        );
 
       el("saveStatusBtn").addEventListener("click", function() {
         var ns = el("statusSel").value;
@@ -346,18 +352,32 @@
           }).catch(function(e){ toast(e.message, true); });
       });
 
-      el("sendTrackBtn").addEventListener("click", function() {
-        var code = (el("trackInput").value||"").trim().toUpperCase();
-        if (!code) { toast("Digite o código de rastreio.", true); return; }
-        el("sendTrackBtn").disabled = true;
-        el("sendTrackBtn").textContent = "Enviando...";
-        api({ action: "send-tracking", numero: p.numero, tracking_code: code })
-          .then(function(r) {
-            p.tracking_code = code; p.status = "enviado"; renderStats(); renderTable();
-            toast(r.email_sent ? "Código enviado ao cliente por e-mail!" : "Código salvo (e-mail não configurado).");
-            closeDrawer();
-          }).catch(function(e){ el("sendTrackBtn").disabled=false; el("sendTrackBtn").textContent="Enviar ao cliente"; toast(e.message, true); });
-      });
+      if (p.delivery_type === 'loja') {
+        el("notifyPickupBtn").addEventListener("click", function() {
+          if (!confirm("Avisar " + (p.customer_name||"cliente") + " que o pedido está pronto para retirada?")) return;
+          el("notifyPickupBtn").disabled = true;
+          el("notifyPickupBtn").textContent = "Enviando aviso...";
+          api({ action: "order-update", numero: p.numero, data: { status: "enviado" } })
+            .then(function() {
+              p.status = "enviado"; renderStats(); renderTable();
+              toast("Cliente avisado por e-mail — pedido pronto para retirada!");
+              closeDrawer();
+            }).catch(function(e){ el("notifyPickupBtn").disabled=false; el("notifyPickupBtn").textContent="🏪 Avisar cliente — pedido pronto"; toast(e.message, true); });
+        });
+      } else {
+        el("sendTrackBtn").addEventListener("click", function() {
+          var code = (el("trackInput").value||"").trim().toUpperCase();
+          if (!code) { toast("Digite o código de rastreio.", true); return; }
+          el("sendTrackBtn").disabled = true;
+          el("sendTrackBtn").textContent = "Enviando...";
+          api({ action: "send-tracking", numero: p.numero, tracking_code: code })
+            .then(function(r) {
+              p.tracking_code = code; p.status = "enviado"; renderStats(); renderTable();
+              toast(r.email_sent ? "Código enviado ao cliente por e-mail!" : "Código salvo (e-mail não configurado).");
+              closeDrawer();
+            }).catch(function(e){ el("sendTrackBtn").disabled=false; el("sendTrackBtn").textContent="Enviar ao cliente"; toast(e.message, true); });
+        });
+      }
 
       el("drawerOverlay").classList.add("open");
       el("drawer").classList.add("open");

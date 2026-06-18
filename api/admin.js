@@ -149,19 +149,22 @@ export default async function handler(req, res) {
 
       /* envia e-mail ao cliente conforme o novo status */
       var newStatus = body.data && body.data.status;
-      var STATUS_EMAILS = {
-        em_preparo: { emoji: "🔧", titulo: "Seu pedido está sendo preparado!", msg: "Estamos separando e conferindo cada item com cuidado. Em breve será enviado." },
-        enviado:    { emoji: "📦", titulo: "Seu pedido foi enviado!", msg: "Seu pedido está a caminho. Assim que tivermos o código de rastreio, te avisamos." },
-        entregue:   { emoji: "✅", titulo: "Pedido entregue!", msg: "Seu pedido foi entregue. Esperamos que você aproveite muito! Qualquer dúvida, estamos aqui." },
-        cancelado:  { emoji: "❌", titulo: "Pedido cancelado", msg: "Seu pedido foi cancelado. Se tiver alguma dúvida ou quiser fazer um novo pedido, fale conosco." },
-      };
-      var emailCfg = STATUS_EMAILS[newStatus];
       var RESEND_KEY = process.env.RESEND_API_KEY;
-      if (emailCfg && RESEND_KEY) {
-        /* busca dados do cliente */
-        var pedR = await sb("/rest/v1/pedidos?numero=eq." + encodeURIComponent(body.numero) + "&select=customer_name,customer_email,total", "GET");
+      if (newStatus && RESEND_KEY) {
+        /* busca dados do cliente + tipo de entrega */
+        var pedR = await sb("/rest/v1/pedidos?numero=eq." + encodeURIComponent(body.numero) + "&select=customer_name,customer_email,total,delivery_type", "GET");
         var ped = pedR.data && pedR.data[0];
-        if (ped && ped.customer_email) {
+        var isLoja = ped && ped.delivery_type === "loja";
+        var STATUS_EMAILS = {
+          em_preparo: { emoji: "🔧", titulo: "Seu pedido está sendo preparado!", msg: "Estamos separando e conferindo cada item com cuidado." + (isLoja ? " Em breve estará pronto para retirada." : " Em breve será enviado.") },
+          enviado:    isLoja
+            ? { emoji: "🏪", titulo: "Seu pedido está pronto para retirada!", msg: "Seu pedido está pronto! Passe na nossa loja para retirar no horário de funcionamento.\n\nEndereço: Av. Assis Brasil, 2574 — Cristo Redentor, Porto Alegre/RS." }
+            : { emoji: "📦", titulo: "Seu pedido foi enviado!", msg: "Seu pedido está a caminho. Assim que tivermos o código de rastreio, te avisamos." },
+          entregue:   { emoji: "✅", titulo: isLoja ? "Retirada confirmada!" : "Pedido entregue!", msg: isLoja ? "Obrigado pela visita! Esperamos que você aproveite muito." : "Seu pedido foi entregue. Esperamos que você aproveite muito! Qualquer dúvida, estamos aqui." },
+          cancelado:  { emoji: "❌", titulo: "Pedido cancelado", msg: "Seu pedido foi cancelado. Se tiver alguma dúvida ou quiser fazer um novo pedido, fale conosco." },
+        };
+        var emailCfg = STATUS_EMAILS[newStatus];
+        if (emailCfg && ped && ped.customer_email) {
           var statusHtml =
             '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Atualização do pedido</title></head>' +
             '<body style="margin:0;padding:0;background:#f5f5f5;font-family:\'Helvetica Neue\',sans-serif">' +

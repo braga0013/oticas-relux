@@ -52,6 +52,10 @@
     cancelado: "Cancelado",
     pendente:  "Pendente",
   };
+  function statusLabel(o) {
+    if (o.status === "enviado" && o.delivery_type === "loja") return "Pronto p/ retirada";
+    return STATUS_LABEL[o.status] || o.status || "Recebido";
+  }
   var STATUS_CLS = {
     pago: "ok", enviado: "ok", entregue: "ok",
     aguardando_pagamento: "pend", pendente: "pend",
@@ -75,7 +79,7 @@
         return;
       }
       box.innerHTML = orders.map(function(o) {
-        var st  = STATUS_LABEL[o.status] || o.status || "Recebido";
+        var st  = statusLabel(o);
         var cls = STATUS_CLS[o.status] || "pend";
         var its = Array.isArray(o.items) ? o.items.length : 0;
         var isPending = o.status === "aguardando_pagamento" || o.status === "pendente";
@@ -94,8 +98,7 @@
           '<div class="order-right">' +
             '<span class="order-status ' + cls + '">' + st + '</span>' +
             '<b>' + fmtBRL(o.total) + '</b>' +
-            '<a href="pedido.html?numero=' + encodeURIComponent(o.numero) + '" ' +
-               'style="font-size:.78rem;color:var(--gold-deep);text-decoration:none">Rastrear →</a>' +
+            (o.delivery_type !== 'loja' ? '<a href="pedido.html?numero=' + encodeURIComponent(o.numero) + '" style="font-size:.78rem;color:var(--gold-deep);text-decoration:none">Rastrear →</a>' : '') +
           '</div>' +
         '</div>';
       }).join("");

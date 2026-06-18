@@ -189,7 +189,7 @@
       if (!_session) return Promise.resolve([]);
       return sbFetch(
         "/rest/v1/pedidos?user_id=eq." + _session.user.id +
-        "&select=numero,status,created_at,total,items,shipping_method,tracking_code&order=created_at.desc&limit=50",
+        "&select=numero,status,created_at,total,items,shipping_method,tracking_code,delivery_type&order=created_at.desc&limit=50",
         "GET", null, _session.access_token
       ).then(function(r) { return (r.ok && Array.isArray(r.data)) ? r.data : []; })
        .catch(function() { return []; });
