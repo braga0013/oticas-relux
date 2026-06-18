@@ -298,19 +298,33 @@
         var pix = el("csPix"); pix.hidden = false;
         if (o.pm === "pix") {
           var pixCode = res.qr_code || "";
-          pix.innerHTML = (res.qr_code_base64 ? '<img src="data:image/png;base64,' + res.qr_code_base64 + '" alt="QR Code Pix" style="width:180px;height:180px;margin:0 auto 12px;display:block">' : "") +
-            "<b>Pix copia e cola</b>" +
-            '<div style="word-break:break-all;font-size:.72rem;background:rgba(0,0,0,.06);border-radius:8px;padding:8px 12px;margin:8px 0 10px">' + pixCode + "</div>" +
-            '<button id="pixCopyBtn" type="button" style="background:var(--gold,#c8920a);color:#000;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.85rem;margin-bottom:10px">Copiar código Pix</button>' +
-            "<br><b>Total: " + fmt(o.total) + "</b>";
-          var copyBtn = el("pixCopyBtn");
-          if (copyBtn) {
-            copyBtn.addEventListener("click", function () {
-              navigator.clipboard.writeText(pixCode).then(function () {
+          var qrImg = res.qr_code_base64
+            ? '<img src="data:image/png;base64,' + res.qr_code_base64 + '" alt="QR Code Pix" style="width:180px;height:180px;margin:0 auto 12px;display:block;border-radius:8px">'
+            : "";
+          if (pixCode) {
+            pix.innerHTML = qrImg +
+              "<b>Pix copia e cola</b>" +
+              '<input id="pixCodeInput" type="text" readonly value="' + pixCode.replace(/"/g, "&quot;") + '"' +
+              ' style="width:100%;font-size:.68rem;padding:8px 10px;border:1px solid rgba(0,0,0,.15);border-radius:8px;background:rgba(0,0,0,.04);margin:6px 0 10px;cursor:text;box-sizing:border-box">' +
+              '<button id="pixCopyBtn" type="button" style="background:var(--gold,#c8920a);color:#000;border:none;padding:8px 20px;border-radius:8px;cursor:pointer;font-weight:600;font-size:.85rem;margin-bottom:10px">Copiar código Pix</button>' +
+              "<br><b>Total: " + fmt(o.total) + "</b>";
+            var copyBtn = el("pixCopyBtn");
+            var codeInput = el("pixCodeInput");
+            if (copyBtn) {
+              copyBtn.addEventListener("click", function () {
+                if (codeInput) { codeInput.select(); }
+                var copied = false;
+                try { copied = document.execCommand("copy"); } catch(e) {}
+                if (!copied && navigator.clipboard) {
+                  navigator.clipboard.writeText(pixCode).catch(function(){});
+                }
                 copyBtn.textContent = "Copiado! ✓";
                 copyBtn.style.background = "#22c55e";
-              }, function () {});
-            });
+                setTimeout(function() { copyBtn.textContent = "Copiar código Pix"; copyBtn.style.background = ""; }, 3000);
+              });
+            }
+          } else {
+            pix.innerHTML = "<b style='color:var(--muted)'>QR Code não disponível — a loja receberá seu pedido e enviará os dados de pagamento por e-mail.</b>";
           }
           el("csMsg").textContent = "Escaneie o QR ou copie o código Pix no app do seu banco. A confirmação aparece aqui automaticamente.";
           document.querySelector(".cs-card h2").textContent = "Quase lá — pague o Pix";

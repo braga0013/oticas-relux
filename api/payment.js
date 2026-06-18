@@ -123,11 +123,16 @@ module.exports = async function handler(req, res) {
     let qr_code = null, qr_code_base64 = null, ticket_url = null;
 
     if (billingType === "PIX") {
+      /* aguarda 1s — Asaas às vezes precisa de um momento para gerar o QR */
+      await new Promise(function(r) { setTimeout(r, 1000); });
       try {
         const pix = await asaasReq("/payments/" + payment.id + "/pixQrCode", "GET", null, KEY);
+        console.log("[payment] pixQrCode response:", JSON.stringify(pix));
         qr_code = pix.payload || null;
         qr_code_base64 = pix.encodedImage || null;
-      } catch (_) {}
+      } catch (pixErr) {
+        console.error("[payment] pixQrCode error:", pixErr && (pixErr.message || pixErr));
+      }
     }
 
     if (billingType === "BOLETO") {

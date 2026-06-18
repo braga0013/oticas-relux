@@ -21,7 +21,7 @@
     init: function () { return true; },
     pay: function (payload) { return post("/api/payment", payload); },
     status: function (id) {
-      return fetch(API + "/api/status?id=" + encodeURIComponent(id))
+      return fetch(API + "/api/status?id=" + encodeURIComponent(id) + "&_=" + Date.now())
         .then(function (r) { return r.json(); });
     },
   };
