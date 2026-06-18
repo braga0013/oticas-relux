@@ -42,10 +42,10 @@ function buildHtml(o) {
   var enderecoBlock = o.delivery === "loja"
     ? '<p style="margin:0;font-size:14px;color:#555"><strong>Retirar na loja</strong></p>'
     : '<p style="margin:0;font-size:14px;color:#555">' +
-        o.address.rua + ', ' + o.address.numero +
-        (o.address.comp ? ' (' + o.address.comp + ')' : '') +
-        ' — ' + o.address.bairro + ', ' + o.address.cidade + '/' + o.address.uf +
-        ' — CEP ' + o.address.cep +
+        esc(o.address.rua) + ', ' + esc(o.address.numero) +
+        (o.address.comp ? ' (' + esc(o.address.comp) + ')' : '') +
+        ' — ' + esc(o.address.bairro) + ', ' + esc(o.address.cidade) + '/' + esc(o.address.uf) +
+        ' — CEP ' + esc(o.address.cep) +
       '</p>';
 
   return (
@@ -64,7 +64,7 @@ function buildHtml(o) {
 
     /* hero */
     '<tr><td style="background:#fff;padding:28px 32px 20px">' +
-    '<p style="margin:0 0 4px;font-size:22px;font-weight:700;color:#0a0a0a">Pedido <span style="color:#d97706">' + o.num + '</span></p>' +
+    '<p style="margin:0 0 4px;font-size:22px;font-weight:700;color:#0a0a0a">Pedido <span style="color:#d97706">' + esc(o.num) + '</span></p>' +
     '<p style="margin:0;font-size:13px;color:#888">' + new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }) + '</p>' +
     '</td></tr>' +
 
@@ -135,8 +135,13 @@ module.exports = async function handler(req, res) {
   try { body = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {}); }
   catch (e) { return res.status(400).json({ error: "JSON inválido" }); }
 
-  const storeEmail = process.env.STORE_EMAIL || "bpedrozomoralesbraga@gmail.com";
-  const customerEmail = body.customer && body.customer.email;
+  function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e || "")); }
+  const storeEmail = process.env.STORE_EMAIL || "";
+  if (!storeEmail || !validEmail(storeEmail)) {
+    return res.status(503).json({ error: "STORE_EMAIL não configurado ou inválido no servidor." });
+  }
+  const rawCustomerEmail = body.customer && body.customer.email;
+  const customerEmail = rawCustomerEmail && validEmail(rawCustomerEmail) ? rawCustomerEmail : null;
   const html = buildHtml(body);
   const storeSubject = "🛍️ Novo pedido " + (body.num || "") + " — Óticas Relux";
   const customerSubject = "✅ Pedido " + (body.num || "") + " recebido — Óticas Relux";

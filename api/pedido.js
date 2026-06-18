@@ -2,9 +2,15 @@
    POST {action:"create", ...dados} → salva pedido no Supabase
    GET  ?numero=RLX-... → retorna status + rastreio para o cliente */
 
-const SB_URL = (process.env.SUPABASE_URL || "https://joktfcfcssxhhyiuxwer.supabase.co").replace(/\/$/, "");
-const SB_ANON = process.env.SUPABASE_ANON_KEY || "sb_publishable_vxUtkkhNJ8Z_U_4EkuTutg_HY-pB-Gj";
+const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
+const SB_ANON = process.env.SUPABASE_ANON_KEY || "";
 const SB_SVC  = process.env.SUPABASE_SERVICE_KEY || "";
+
+/* Sanitize a string — strips HTML tags and limits length */
+function sanitize(val, maxLen) {
+  if (val === null || val === undefined) return null;
+  return String(val).replace(/<[^>]*>/g, "").trim().slice(0, maxLen || 500);
+}
 
 function cors(res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -37,6 +43,9 @@ var STATUS_LABEL = {
 module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  if (!SB_URL) return res.status(503).json({ error: "SUPABASE_URL não configurado no servidor." });
+  if (!SB_ANON) return res.status(503).json({ error: "SUPABASE_ANON_KEY não configurado no servidor." });
 
   /* ── PATCH: atualiza status do pedido (confirmação de pagamento / cancelamento) ── */
   if (req.method === "PATCH") {
@@ -116,26 +125,42 @@ module.exports = async function handler(req, res) {
     if (body.action !== "create") return res.status(400).json({ error: "Ação inválida." });
     if (!body.numero) return res.status(400).json({ error: "numero é obrigatório." });
 
+    /* Validate amount fields are non-negative numbers */
+    var total = Number(body.total) || 0;
+    if (total < 0) return res.status(400).json({ error: "Valor de total inválido." });
+
+    /* Validate email format if provided */
+    var rawEmail = body.customer_email || null;
+    if (rawEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawEmail)) {
+      return res.status(400).json({ error: "E-mail do cliente inválido." });
+    }
+
+    /* Allowed values for enum fields */
+    var allowedDelivery = ["entrega", "loja", "casa"];
+    var allowedPayMethod = ["pix", "cartao", "card", "boleto", "credit_card", "PIX", "CREDIT_CARD", "BOLETO"];
+    var allowedStatus = ["aguardando_pagamento", "pago", "em_preparo", "enviado", "entregue", "cancelado", "pendente"];
+    var allowedPayStatus = ["pending", "approved", "cancelled", "rejected"];
+
     var data = {
-      numero:          body.numero,
+      numero:          sanitize(body.numero, 30),
       user_id:         body.user_id         || null,
-      customer_name:   body.customer_name   || null,
-      customer_email:  body.customer_email || null,
-      customer_phone:  body.customer_phone || null,
-      customer_cpf:    body.customer_cpf   || null,
+      customer_name:   sanitize(body.customer_name, 120),
+      customer_email:  rawEmail,
+      customer_phone:  sanitize(body.customer_phone, 20),
+      customer_cpf:    sanitize(body.customer_cpf, 20),
       items:           body.items          || [],
       subtotal:        Number(body.subtotal)      || 0,
       discount:        Number(body.discount)      || 0,
-      total:           Number(body.total)         || 0,
-      delivery_type:   body.delivery_type  || "entrega",
-      shipping_method: body.shipping_method || null,
+      total:           total,
+      delivery_type:   allowedDelivery.includes(body.delivery_type) ? body.delivery_type : "entrega",
+      shipping_method: sanitize(body.shipping_method, 30),
       shipping_price:  Number(body.shipping_price) || 0,
-      shipping_cep:    body.shipping_cep   || null,
+      shipping_cep:    sanitize(body.shipping_cep, 10),
       shipping_address:body.shipping_address || null,
-      payment_method:  body.payment_method || null,
-      payment_id:      body.payment_id     || null,
-      payment_status:  body.payment_status || "pending",
-      status:          body.status         || "aguardando_pagamento",
+      payment_method:  allowedPayMethod.includes(body.payment_method) ? body.payment_method : null,
+      payment_id:      sanitize(body.payment_id, 100),
+      payment_status:  allowedPayStatus.includes(body.payment_status) ? body.payment_status : "pending",
+      status:          allowedStatus.includes(body.status) ? body.status : "aguardando_pagamento",
     };
 
     /* usa anon key — a RLS policy permite INSERT público */

@@ -3,10 +3,20 @@
    Usa SUPABASE_SERVICE_KEY (env var no Vercel) para bypassar RLS. */
 const rateLimit = require("./_ratelimit");
 
-const ADMIN_USER = process.env.ADMIN_USER || "RELUXADMIN";
-const ADMIN_PASS = process.env.ADMIN_PASS || "DOMINGO12";
-const SB_URL = (process.env.SUPABASE_URL || "https://joktfcfcssxhhyiuxwer.supabase.co").replace(/\/$/, "");
+const ADMIN_USER = process.env.ADMIN_USER || "";
+const ADMIN_PASS = process.env.ADMIN_PASS || "";
+const SB_URL = (process.env.SUPABASE_URL || "").replace(/\/$/, "");
 const SB_KEY = process.env.SUPABASE_SERVICE_KEY || "";
+
+/* HTML-escape helper — prevents stored XSS in admin-generated emails */
+function esc(s) {
+  return String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
 
 function checkAuth(req) {
   return (
@@ -30,7 +40,8 @@ async function sb(path, method, body, extra) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  const allowedOrigin = process.env.ALLOWED_ORIGIN || "https://oticasrelux.com.br";
+  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Admin-User, X-Admin-Pass");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -40,8 +51,14 @@ export default async function handler(req, res) {
     return res.status(429).json({ error: "Muitas requisições. Tente novamente em 1 minuto." });
   }
 
+  if (!ADMIN_USER || !ADMIN_PASS) {
+    return res.status(503).json({ error: "Credenciais de admin não configuradas no servidor. Configure ADMIN_USER e ADMIN_PASS nas variáveis de ambiente." });
+  }
+  if (!SB_URL) {
+    return res.status(503).json({ error: "SUPABASE_URL não configurado no servidor." });
+  }
   if (!SB_KEY) {
-    return res.status(500).json({ error: "SUPABASE_SERVICE_KEY não configurado no Vercel." });
+    return res.status(503).json({ error: "SUPABASE_SERVICE_KEY não configurado no Vercel." });
   }
   if (!checkAuth(req)) {
     return res.status(401).json({ error: "Credenciais de admin inválidas." });
@@ -155,9 +172,9 @@ export default async function handler(req, res) {
             '<tr><td style="background:#fff;padding:32px">' +
             '<p style="font-size:24px;margin:0 0 8px">' + emailCfg.emoji + '</p>' +
             '<p style="font-size:22px;font-weight:700;color:#0a0a0a;margin:0 0 8px">' + emailCfg.titulo + '</p>' +
-            '<p style="color:#555;margin:0 0 24px">Olá, ' + (ped.customer_name || "cliente") + '! ' + emailCfg.msg + '</p>' +
+            '<p style="color:#555;margin:0 0 24px">Olá, ' + esc(ped.customer_name || "cliente") + '! ' + emailCfg.msg + '</p>' +
             '<div style="background:#fafafa;border:1px solid #eee;border-radius:10px;padding:16px 20px;margin-bottom:24px">' +
-            '<p style="margin:0;font-size:13px;color:#888">Pedido <strong style="color:#0a0a0a">' + body.numero + '</strong></p>' +
+            '<p style="margin:0;font-size:13px;color:#888">Pedido <strong style="color:#0a0a0a">' + esc(body.numero) + '</strong></p>' +
             '</div>' +
             '<a href="https://oticasrelux.com.br/pedido.html?numero=' + encodeURIComponent(body.numero) + '" ' +
             'style="display:inline-block;background:#d97706;color:#000;padding:14px 28px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none">Ver meu pedido →</a>' +
@@ -212,14 +229,14 @@ export default async function handler(req, res) {
           '<span style="font-size:20px;font-weight:800;color:#fff">ÓTICAS RELUX</span></td></tr>' +
           '<tr><td style="background:#fff;padding:32px">' +
           '<p style="font-size:22px;font-weight:700;color:#0a0a0a;margin:0 0 8px">Seu pedido foi enviado! 📦</p>' +
-          '<p style="color:#555;margin:0 0 24px">Olá, ' + (pedido.customer_name || "cliente") + '! Seu pedido <strong>' + body.numero + '</strong> saiu para entrega.</p>' +
+          '<p style="color:#555;margin:0 0 24px">Olá, ' + esc(pedido.customer_name || "cliente") + '! Seu pedido <strong>' + esc(body.numero) + '</strong> saiu para entrega.</p>' +
           '<div style="background:#fafafa;border:1px solid #eee;border-radius:10px;padding:20px;margin-bottom:24px">' +
           '<p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px">Código de rastreio</p>' +
-          '<p style="margin:0;font-size:22px;font-weight:700;color:#0a0a0a;letter-spacing:2px">' + body.tracking_code + '</p>' +
-          '<p style="margin:8px 0 0;font-size:13px;color:#888">Modalidade: ' + (pedido.shipping_method || "PAC") + ' — Correios</p>' +
+          '<p style="margin:0;font-size:22px;font-weight:700;color:#0a0a0a;letter-spacing:2px">' + esc(body.tracking_code) + '</p>' +
+          '<p style="margin:8px 0 0;font-size:13px;color:#888">Modalidade: ' + esc(pedido.shipping_method || "PAC") + ' — Correios</p>' +
           '</div>' +
-          '<a href="' + correiosUrl + '" style="display:inline-block;background:#d97706;color:#000;padding:14px 28px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:24px">Rastrear meu pedido →</a>' +
-          '<p style="color:#888;font-size:13px;margin:0">Ou acesse: <a href="' + correiosUrl + '" style="color:#d97706">' + correiosUrl + '</a></p>' +
+          '<a href="' + esc(correiosUrl) + '" style="display:inline-block;background:#d97706;color:#000;padding:14px 28px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:24px">Rastrear meu pedido →</a>' +
+          '<p style="color:#888;font-size:13px;margin:0">Ou acesse: <a href="' + esc(correiosUrl) + '" style="color:#d97706">' + esc(correiosUrl) + '</a></p>' +
           '</td></tr>' +
           '<tr><td style="background:#0a0a0a;border-radius:0 0 12px 12px;padding:16px 32px;text-align:center">' +
           '<p style="margin:0;font-size:12px;color:#888">Dúvidas? Fale conosco pelo WhatsApp.</p>' +
@@ -231,7 +248,7 @@ export default async function handler(req, res) {
           body: JSON.stringify({
             from: "Óticas Relux <onboarding@resend.dev>",
             to: [pedido.customer_email],
-            subject: "Seu pedido " + body.numero + " foi enviado! 📦",
+            subject: "Seu pedido " + String(body.numero).replace(/[^\w\-]/g, "") + " foi enviado! 📦",
             html: trackHtml,
           }),
         });

@@ -33,6 +33,15 @@ async function asaasReq(path, method, body, key) {
   return data;
 }
 
+/* Strip HTML tags and limit length for fields sent to third-party API */
+function sanitizeStr(s, maxLen) {
+  return String(s || "").replace(/<[^>]*>/g, "").trim().slice(0, maxLen || 200);
+}
+
+function validEmail(e) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e || ""));
+}
+
 async function findOrCreateCustomer(payer, key) {
   const cpf = String(payer.cpf || "").replace(/\D/g, "");
   if (cpf.length >= 11) {
@@ -40,9 +49,11 @@ async function findOrCreateCustomer(payer, key) {
     if (s.data && s.data.length > 0) return s.data[0].id;
   }
   const phone = String(payer.phone || "").replace(/\D/g, "").slice(0, 20);
+  const rawEmail = sanitizeStr(payer.email, 254);
+  const safeEmail = validEmail(rawEmail) ? rawEmail : "cliente@oticasrelux.com.br";
   const c = await asaasReq("/customers", "POST", {
-    name: payer.name || "Cliente Relux",
-    email: payer.email || "cliente@oticasrelux.com.br",
+    name: sanitizeStr(payer.name, 120) || "Cliente Relux",
+    email: safeEmail,
     mobilePhone: phone || undefined,
     cpfCnpj: cpf.length >= 11 ? cpf : undefined,
     notificationDisabled: true,
@@ -70,6 +81,8 @@ module.exports = async function handler(req, res) {
   const { method, amount, description, payer, creditCard, installments } = body;
   const value = Math.round((Number(amount) || 0) * 100) / 100;
   if (!value || value <= 0) return res.status(400).json({ error: "Valor inválido" });
+  /* Reject unreasonably large amounts (> R$50.000) to limit financial exposure */
+  if (value > 50000) return res.status(400).json({ error: "Valor excede o limite permitido por transação." });
 
   const billingTypeMap = { pix: "PIX", boleto: "BOLETO", card: "CREDIT_CARD" };
   const billingType = billingTypeMap[method];
@@ -100,7 +113,7 @@ module.exports = async function handler(req, res) {
         charge.installmentValue = Math.round((value / inst) * 100) / 100;
       }
       charge.creditCard = {
-        holderName: creditCard.holderName || (payer && payer.name) || "N/A",
+        holderName: sanitizeStr(creditCard.holderName || (payer && payer.name) || "N/A", 120),
         number: String(creditCard.number).replace(/\s/g, ""),
         expiryMonth: creditCard.expiryMonth,
         expiryYear: creditCard.expiryYear && String(creditCard.expiryYear).length === 2
