@@ -324,11 +324,11 @@
       .catch(function (err) {
         setProcessing(false);
         var msg = (err && err.error) || "";
-        /* se a chave Asaas não está configurada, redireciona para WhatsApp */
-        if (msg.indexOf("não configurado") !== -1 || msg.indexOf("ASAAS") !== -1) {
+        /* fallback para WhatsApp apenas quando a chave não está configurada no servidor */
+        if (msg === "ASAAS_API_KEY não configurado no servidor.") {
           return finalizeWhatsApp(o);
         }
-        showError(msg);
+        showError(msg || "Não foi possível gerar o Pix. Tente novamente.");
       });
   }
 
@@ -392,7 +392,7 @@
     }).catch(function (err) {
       setProcessing(false);
       var msg = (err && err.error) || "";
-      if (msg.indexOf("não configurado") !== -1 || msg.indexOf("ASAAS") !== -1) {
+      if (msg === "ASAAS_API_KEY não configurado no servidor.") {
         return finalizeWhatsApp(o);
       }
       showError(msg || "Não foi possível processar o pagamento. Confira os dados e tente novamente.");
