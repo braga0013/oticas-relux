@@ -51,7 +51,7 @@
   /* ---------- parcelas do cartão ---------- */
   function fillInstallments() {
     var sel = el("ccparc"); if (!sel) return;
-    var total = subtotal();
+    var total = subtotal() + freteAtual;
     var html = "";
     for (var n = 1; n <= 10; n++) {
       html += '<option value="' + n + '">' + n + "x de " + fmt(total / n) + " sem juros</option>";
@@ -104,7 +104,7 @@
         var idx = parseInt(sel.getAttribute("data-idx"), 10);
         freteAtual = opcoes[idx] ? opcoes[idx].preco : 0;
       }
-      renderSummary();
+      renderSummary(); fillInstallments();
     });
   }
 
@@ -123,7 +123,7 @@
       }).join("") +
       '</div>';
     freteAtual = opcoes[0].preco;
-    renderSummary();
+    renderSummary(); fillInstallments();
     bindFreteList(opcoes);
   }
 
@@ -133,7 +133,7 @@
     if (subtotal() >= FRETE_GRATIS_ACIMA) {
       freteAtual = 0;
       box.innerHTML = '<div class="frete-gratis"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg> Frete grátis para compras acima de R$ 300!</div>';
-      renderSummary(); return;
+      renderSummary(); fillInstallments(); return;
     }
 
     /* Spinner enquanto calcula */
@@ -537,7 +537,7 @@
       syncOptionUI("deliveryOpts");
       var isLoja = delivery() === "loja";
       el("addrFields").style.display = isLoja ? "none" : "";
-      if (isLoja) { freteAtual = 0; var fo = el("freteOpts"); if (fo) fo.innerHTML = ""; renderSummary(); }
+      if (isLoja) { freteAtual = 0; var fo = el("freteOpts"); if (fo) fo.innerHTML = ""; renderSummary(); fillInstallments(); }
     });
 
     // pagamento
