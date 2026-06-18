@@ -300,9 +300,16 @@
         '<div class="drow"><span>CPF</span><strong>'+(p.customer_cpf||"—")+'</strong></div>' +
 
         '<p class="dsec">Produtos</p>' +
-        '<div class="d-items">' + (its.length ? its.map(function(it){
-          return '<div class="d-item"><span>'+(it.qty>1?it.qty+"× ":"")+it.name+(it.brand?" — "+it.brand:"")+'</span><span>'+fmtBRL((it.price||0)*(it.qty||1))+'</span></div>';
-        }).join("") : '<div class="d-item"><span>—</span></div>') + '</div>' +
+        '<div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:8px">' +
+        (its.length ? its.map(function(it, idx){
+          var bg = idx % 2 === 0 ? '#fff' : '#fafafa';
+          var lineTotal = (Number(it.price)||0) * (Number(it.qty)||1);
+          return '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:'+bg+';border-bottom:1px solid #f0f0f0;font-size:.85rem;color:#111">' +
+            '<span><strong style="font-weight:600">'+(it.qty>1?it.qty+'× ':'')+it.name+'</strong>'+(it.brand?'<span style="color:#888"> — '+it.brand+'</span>':'')+'</span>' +
+            '<span style="font-weight:600;white-space:nowrap;margin-left:12px">'+fmtBRL(lineTotal)+'</span>' +
+          '</div>';
+        }).join('') : '<div style="padding:12px 14px;color:#888;font-size:.85rem">Sem itens registrados.</div>') +
+        '</div>' +
         '<div class="drow" style="margin-top:4px"><span>Subtotal</span><span>'+fmtBRL(p.subtotal||0)+'</span></div>' +
         (p.discount>0?'<div class="drow"><span>Desconto Pix</span><span style="color:#16a34a">− '+fmtBRL(p.discount)+'</span></div>':'')+
         '<div class="drow"><span>Frete ('+(p.shipping_method||"—")+')</span><span>'+(p.shipping_price>0?fmtBRL(p.shipping_price):"Grátis")+'</span></div>' +
