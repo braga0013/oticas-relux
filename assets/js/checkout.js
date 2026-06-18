@@ -267,7 +267,6 @@
 
   /* ---------- finalizar: roteia real (Mercado Pago) x WhatsApp ---------- */
   function finalize() {
-    if (!requireLogin()) return;
     if (!items().length) return;
     if (!validate()) return;
     var o = buildOrder();
