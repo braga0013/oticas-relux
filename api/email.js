@@ -136,26 +136,33 @@ module.exports = async function handler(req, res) {
   catch (e) { return res.status(400).json({ error: "JSON inválido" }); }
 
   const storeEmail = process.env.STORE_EMAIL || "bpedrozomoralesbraga@gmail.com";
+  const customerEmail = body.customer && body.customer.email;
   const html = buildHtml(body);
-  const subject = "🛍️ Novo pedido " + (body.num || "") + " — Óticas Relux";
+  const storeSubject = "🛍️ Novo pedido " + (body.num || "") + " — Óticas Relux";
+  const customerSubject = "✅ Pedido " + (body.num || "") + " recebido — Óticas Relux";
 
-  try {
+  async function sendEmail(to, subject) {
     const r = await fetch(RESEND_API, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + KEY,
-      },
-      body: JSON.stringify({
-        from: "Óticas Relux <onboarding@resend.dev>",
-        to: [storeEmail],
-        subject,
-        html,
-      }),
+      headers: { "Content-Type": "application/json", Authorization: "Bearer " + KEY },
+      body: JSON.stringify({ from: "Óticas Relux <onboarding@resend.dev>", to: [to], subject, html }),
     });
-    const data = await r.json();
-    if (!r.ok) return res.status(r.status).json({ error: data.message || "Erro ao enviar e-mail", detail: data });
-    return res.status(200).json({ ok: true, id: data.id });
+    return r.json();
+  }
+
+  try {
+    /* notificação para a loja */
+    const storeResult = await sendEmail(storeEmail, storeSubject);
+
+    /* confirmação para o cliente (se tiver e-mail e for diferente da loja) */
+    if (customerEmail && customerEmail !== storeEmail) {
+      sendEmail(customerEmail, customerSubject).catch(function() {});
+    }
+
+    if (!storeResult.id && storeResult.message) {
+      return res.status(400).json({ error: storeResult.message, detail: storeResult });
+    }
+    return res.status(200).json({ ok: true, id: storeResult.id });
   } catch (e) {
     return res.status(500).json({ error: "Falha ao comunicar com o serviço de e-mail" });
   }

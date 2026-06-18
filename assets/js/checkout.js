@@ -276,7 +276,9 @@
 
   function finalizeWhatsApp(o) {
     el("csOrder").textContent = "Nº " + o.num;
-    el("csWhats").href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(orderMessage(o));
+    var wa = el("csWhats");
+    wa.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(orderMessage(o));
+    wa.hidden = false;
     var pix = el("csPix");
     if (o.pm === "pix") { pix.hidden = false; pix.innerHTML = "<b>Pagamento via Pix</b><br>Total " + fmt(o.total) + " — envie o pedido pelo WhatsApp e a loja te manda o código Pix."; }
     else pix.hidden = true;
@@ -328,7 +330,7 @@
           }
           el("csMsg").textContent = "Escaneie o QR ou copie o código Pix no app do seu banco. A confirmação aparece aqui automaticamente.";
           document.querySelector(".cs-card h2").textContent = "Quase lá — pague o Pix";
-          if (res.id) pollStatus(res.id);
+          if (res.id) pollStatus(res.id, o.num);
         }
         saveOrder(o, "pendente", res.id);
         sendOrderEmail(o, "pendente");
@@ -346,7 +348,7 @@
       });
   }
 
-  function pollStatus(id) {
+  function pollStatus(id, orderNum) {
     var tries = 0, max = 60;
     var t = setInterval(function () {
       tries++;
@@ -354,8 +356,17 @@
         if (s.status === "approved") {
           clearInterval(t);
           document.querySelector(".cs-card h2").textContent = "Pagamento aprovado! 🎉";
-          el("csMsg").textContent = "Recebemos seu pagamento. Em breve falamos sobre a entrega.";
+          el("csMsg").textContent = "Recebemos seu pagamento. Em breve você receberá um e-mail com os detalhes.";
           var pix = el("csPix"); if (pix) pix.hidden = true;
+          /* atualiza status no Supabase */
+          if (orderNum) {
+            var apiBase = (window.RELUX_CONFIG && window.RELUX_CONFIG.apiBase) || "";
+            fetch(apiBase + "/api/pedido", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ numero: orderNum, status: "pago" })
+            }).catch(function () {});
+          }
         } else if (s.status === "rejected" || s.status === "cancelled") {
           clearInterval(t); el("csMsg").textContent = "O pagamento não foi concluído. Tente novamente.";
         }

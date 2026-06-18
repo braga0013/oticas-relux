@@ -78,12 +78,18 @@
         var st  = STATUS_LABEL[o.status] || o.status || "Recebido";
         var cls = STATUS_CLS[o.status] || "pend";
         var its = Array.isArray(o.items) ? o.items.length : 0;
+        var isPending = o.status === "aguardando_pagamento" || o.status === "pendente";
+        var cancelBtn = isPending
+          ? '<button class="order-cancel-btn" data-num="' + o.numero + '" ' +
+              'style="font-size:.73rem;color:#ef4444;background:none;border:none;cursor:pointer;padding:0;margin-top:2px">Cancelar pedido</button>'
+          : '';
         return '<div class="order-row">' +
           '<div>' +
             '<strong>' + o.numero + '</strong>' +
             '<span>' + fmtDate(o.created_at) + ' · ' + its + ' item(ns)' +
               (o.tracking_code ? ' · 🚚 ' + o.tracking_code : '') +
             '</span>' +
+            cancelBtn +
           '</div>' +
           '<div class="order-right">' +
             '<span class="order-status ' + cls + '">' + st + '</span>' +
@@ -93,6 +99,21 @@
           '</div>' +
         '</div>';
       }).join("");
+
+      /* delegação: cancelar pedido */
+      box.addEventListener("click", function(e) {
+        var btn = e.target.closest(".order-cancel-btn");
+        if (!btn) return;
+        var num = btn.getAttribute("data-num");
+        if (!confirm("Cancelar o pedido " + num + "?")) return;
+        btn.disabled = true; btn.textContent = "Cancelando…";
+        fetch("/api/pedido", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ numero: num, status: "cancelado" })
+        }).then(function() { renderOrders(); })
+          .catch(function() { btn.disabled = false; btn.textContent = "Cancelar pedido"; });
+      });
     });
   }
 

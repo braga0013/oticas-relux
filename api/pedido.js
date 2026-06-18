@@ -16,6 +16,7 @@ async function sbFetch(path, method, body, useService) {
   var key = useService ? SB_SVC : SB_ANON;
   var headers = { apikey: key, Authorization: "Bearer " + key, "Content-Type": "application/json" };
   if (method === "POST") headers["Prefer"] = "return=representation";
+  if (method === "PATCH") headers["Prefer"] = "return=minimal";
   var opts = { method: method || "GET", headers: headers };
   if (body) opts.body = JSON.stringify(body);
   var res = await fetch(SB_URL + path, opts);
@@ -36,6 +37,20 @@ var STATUS_LABEL = {
 module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  /* ── PATCH: atualiza status do pedido (confirmação de pagamento) ── */
+  if (req.method === "PATCH") {
+    var pb;
+    try { pb = typeof req.body === "string" ? JSON.parse(req.body) : (req.body || {}); }
+    catch (e) { return res.status(400).json({ error: "JSON inválido" }); }
+    var allowed = ["pago", "em_preparo", "enviado", "entregue", "cancelado", "aguardando_pagamento"];
+    if (!pb.numero || !allowed.includes(pb.status)) return res.status(400).json({ error: "numero/status inválidos" });
+    var patch = { status: pb.status };
+    if (pb.status === "pago") patch.payment_status = "approved";
+    var pr = await sbFetch("/rest/v1/pedidos?numero=eq." + encodeURIComponent(pb.numero), "PATCH", patch, true);
+    if (!pr.ok) return res.status(pr.status).json({ error: "Erro ao atualizar pedido", detail: pr.data });
+    return res.json({ ok: true });
+  }
 
   /* ── GET: consulta pública de pedido pelo número ── */
   if (req.method === "GET") {
