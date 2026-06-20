@@ -1,4 +1,4 @@
-/* ÓTICAS RELUX — renderiza a página de produto a partir de ?id= */
+﻿/* ÓTICAS RELUX — renderiza a página de produto a partir de ?id= */
 (function () {
   "use strict";
   function qs(name) {
@@ -22,7 +22,7 @@
   set("pdpBrand", p.brand);
   set("pdpCat", p.category);
   var catLink = el("pdpCatLink");
-  if (catLink) catLink.href = "index.html#colecoes";
+  if (catLink) catLink.href = "/#colecoes";
 
   /* badge */
   var badge = el("pdpBadge");

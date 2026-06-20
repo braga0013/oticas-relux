@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8" />
@@ -61,7 +61,7 @@
 
   <nav class="navbar">
     <div class="container nav-inner">
-      <a class="nav-logo" href="index.html">
+      <a class="nav-logo" href="/">
         <img src="assets/img/logo.svg" alt="Óticas Relux" width="36" height="36" />
         <span>Óticas <strong>Relux</strong></span>
       </a>
@@ -229,7 +229,7 @@
       el("resultWrap").style.display = "none";
       el("searchWrap").style.display = "";
       el("searchInput").value = "";
-      history.pushState({}, "", "pedido.html");
+      history.pushState({}, "", "/pedido");
     });
 
     /* Auto-busca se vier número na URL */

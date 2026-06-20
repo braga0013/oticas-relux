@@ -1,4 +1,4 @@
-/* ÓTICAS RELUX — Catálogo: filtra por categoria (?cat=) e busca (?q=) */
+﻿/* ÓTICAS RELUX — Catálogo: filtra por categoria (?cat=) e busca (?q=) */
 (function () {
   "use strict";
   window.__reluxCatalog = true; // sinaliza ao main.js para não redirecionar a busca aqui
@@ -21,7 +21,7 @@
     var qs = [];
     if (state.cat) qs.push("cat=" + encodeURIComponent(state.cat));
     if (state.q) qs.push("q=" + encodeURIComponent(state.q));
-    history.replaceState(null, "", "catalogo.html" + (qs.length ? "?" + qs.join("&") : ""));
+    history.replaceState(null, "", "/catalogo" + (qs.length ? "?" + qs.join("&") : ""));
   }
 
   function render() {

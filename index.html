@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8" />
@@ -86,7 +86,7 @@
       </form>
 
       <div class="nav-actions">
-        <a class="icon-btn account-btn" id="accountBtn" href="conta.html" aria-label="Entrar ou criar conta">
+        <a class="icon-btn account-btn" id="accountBtn" href="/conta" aria-label="Entrar ou criar conta">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
           <span class="acct-name" id="acctName"></span>
         </a>
@@ -132,12 +132,12 @@
   <!-- ░░░ Mobile menu overlay ░░░ -->
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
     <form class="js-search-form mobile-search" role="search"><input class="js-search-input" type="search" placeholder="Buscar..." aria-label="Buscar" /></form>
-    <a href="catalogo.html?cat=Óculos de Grau" data-link>Óculos de Grau</a>
-    <a href="catalogo.html?cat=Óculos de Sol" data-link>Óculos de Sol</a>
-    <a href="catalogo.html?cat=Óculos de Grau" data-link>Filtro Azul</a>
-    <a href="catalogo.html?cat=Óculos de Grau" data-link>Fotossensível</a>
-    <a href="catalogo.html?cat=Linha Infantil" data-link>Infantil</a>
-    <a href="favoritos.html" data-link>Favoritos</a>
+    <a href="/catalogo?cat=Óculos de Grau" data-link>Óculos de Grau</a>
+    <a href="/catalogo?cat=Óculos de Sol" data-link>Óculos de Sol</a>
+    <a href="/catalogo?cat=Óculos de Grau" data-link>Filtro Azul</a>
+    <a href="/catalogo?cat=Óculos de Grau" data-link>Fotossensível</a>
+    <a href="/catalogo?cat=Linha Infantil" data-link>Infantil</a>
+    <a href="/favoritos" data-link>Favoritos</a>
     <a href="#contato" data-link>Contato</a>
     <div class="mm-actions">
       <button class="theme-toggle mm-theme" id="themeToggleMobile" type="button" aria-label="Alternar tema" title="Alternar tema">
@@ -245,7 +245,7 @@
         <div class="bento reveal">
 
           <!-- 1. Óculos de Grau (card grande - span 2 linhas) -->
-          <a href="catalogo.html?cat=Óculos de Grau" class="cat-card has-photo" data-tone="grau">
+          <a href="/catalogo?cat=Óculos de Grau" class="cat-card has-photo" data-tone="grau">
             <div class="cat-inner">
               <img class="cat-photo" src="assets/img/produtos/grau.png" alt="Óculos de grau" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
               <span class="cat-scrim" aria-hidden="true"></span>
@@ -262,7 +262,7 @@
           </a>
 
           <!-- 2. Óculos de Sol -->
-          <a href="catalogo.html?cat=Óculos de Sol" class="cat-card has-photo" data-tone="sol">
+          <a href="/catalogo?cat=Óculos de Sol" class="cat-card has-photo" data-tone="sol">
             <div class="cat-inner">
               <img class="cat-photo" src="assets/img/produtos/sol.png" alt="Óculos de sol" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
               <span class="cat-scrim" aria-hidden="true"></span>
@@ -279,7 +279,7 @@
           </a>
 
           <!-- 3. Filtro Azul -->
-          <a href="catalogo.html?cat=Óculos de Grau" class="cat-card has-photo" data-tone="filtro-azul">
+          <a href="/catalogo?cat=Óculos de Grau" class="cat-card has-photo" data-tone="filtro-azul">
             <div class="cat-inner">
               <img class="cat-photo" src="assets/img/produtos/grau.png" alt="Filtro de luz azul" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
               <span class="cat-scrim" aria-hidden="true"></span>
@@ -295,7 +295,7 @@
           </a>
 
           <!-- 4. Fotossensível -->
-          <a href="catalogo.html?cat=Óculos de Grau" class="cat-card has-photo" data-tone="fotossensivel">
+          <a href="/catalogo?cat=Óculos de Grau" class="cat-card has-photo" data-tone="fotossensivel">
             <div class="cat-inner">
               <img class="cat-photo" src="assets/img/produtos/grau.png" alt="Lentes fotossensíveis" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
               <span class="cat-scrim" aria-hidden="true"></span>
@@ -311,7 +311,7 @@
           </a>
 
           <!-- 5. Infantil -->
-          <a href="catalogo.html?cat=Linha Infantil" class="cat-card has-photo" data-tone="infantil">
+          <a href="/catalogo?cat=Linha Infantil" class="cat-card has-photo" data-tone="infantil">
             <div class="cat-inner">
               <img class="cat-photo" src="assets/img/produtos/infantil.png" alt="Óculos infantil" loading="lazy" onerror="this.closest('.cat-card').classList.remove('has-photo'); this.remove();">
               <span class="cat-scrim" aria-hidden="true"></span>
@@ -338,7 +338,7 @@
             <span class="eyebrow"><i></i> Destaques da semana</span>
             <h2 class="section-title">Selecionados pela Relux</h2>
           </div>
-          <a class="btn btn-ghost" href="catalogo.html">Ver tudo</a>
+          <a class="btn btn-ghost" href="/catalogo">Ver tudo</a>
         </header>
 
         <div class="products reveal" id="productGrid">
@@ -515,7 +515,7 @@
         <a href="#contato">Contato</a>
         <a href="#">Políticas de privacidade</a>
         <a href="#">Trocas e devoluções</a>
-        <a href="dashboard.html" style="color:var(--muted);font-size:.8rem;margin-top:8px">Área admin</a>
+        <a href="/dashboard" style="color:var(--muted);font-size:.8rem;margin-top:8px">Área admin</a>
       </nav>
     </div>
     <div class="container footer-bottom">

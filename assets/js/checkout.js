@@ -1,4 +1,4 @@
-/* ÓTICAS RELUX — Checkout */
+﻿/* ÓTICAS RELUX — Checkout */
 (function () {
   "use strict";
   var R = window.RELUX || {};
@@ -28,7 +28,7 @@
     var its = items();
     var box = el("sumItems");
     if (!its.length) {
-      box.innerHTML = '<div class="drawer-empty" style="padding:20px 0"><h4>Sua sacola está vazia</h4><p>Adicione produtos para finalizar.</p><a class="btn btn-ghost" href="index.html#destaques">Ver produtos</a></div>';
+      box.innerHTML = '<div class="drawer-empty" style="padding:20px 0"><h4>Sua sacola está vazia</h4><p>Adicione produtos para finalizar.</p><a class="btn btn-ghost" href="/#destaques">Ver produtos</a></div>';
       el("coSubmit").disabled = true; el("coSubmit").style.opacity = ".5"; el("coSubmit").style.pointerEvents = "none";
     } else {
       box.innerHTML = its.map(function (it) {
@@ -259,7 +259,7 @@
     var A = window.RELUX_AUTH;
     if (A && A.onReady) {
       A.onReady(function(u) {
-        if (!u) { location.replace("conta.html?next=checkout.html"); return; }
+        if (!u) { location.replace("/conta?next=checkout.html"); return; }
         cb();
       });
     } else {

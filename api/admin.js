@@ -1,4 +1,4 @@
-/* Óticas Relux — Admin API
+﻿/* Óticas Relux — Admin API
    Autentica via X-Admin-User + X-Admin-Pass headers.
    Usa SUPABASE_SERVICE_KEY (env var no Vercel) para bypassar RLS. */
 const rateLimit = require("./_ratelimit");
@@ -179,7 +179,7 @@ export default async function handler(req, res) {
             '<div style="background:#fafafa;border:1px solid #eee;border-radius:10px;padding:16px 20px;margin-bottom:24px">' +
             '<p style="margin:0;font-size:13px;color:#888">Pedido <strong style="color:#0a0a0a">' + esc(body.numero) + '</strong></p>' +
             '</div>' +
-            '<a href="https://oticasrelux.com.br/pedido.html?numero=' + encodeURIComponent(body.numero) + '" ' +
+            '<a href="https://oticasrelux.com.br/pedido?numero=' + encodeURIComponent(body.numero) + '" ' +
             'style="display:inline-block;background:#d97706;color:#000;padding:14px 28px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none">Ver meu pedido →</a>' +
             '</td></tr>' +
             '<tr><td style="background:#0a0a0a;border-radius:0 0 12px 12px;padding:16px 32px;text-align:center">' +

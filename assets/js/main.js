@@ -1,4 +1,4 @@
-/* ÓTICAS RELUX — interactions */
+﻿/* ÓTICAS RELUX — interactions */
 (function () {
   "use strict";
   var root = document.documentElement;
@@ -86,7 +86,7 @@
       e.preventDefault();
       var inp = f.querySelector(".js-search-input");
       var q = (inp && inp.value || "").trim();
-      window.location.href = "catalogo.html" + (q ? "?q=" + encodeURIComponent(q) : "");
+      window.location.href = "/catalogo" + (q ? "?q=" + encodeURIComponent(q) : "");
     });
   });
 

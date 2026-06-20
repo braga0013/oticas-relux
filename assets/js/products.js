@@ -1,4 +1,4 @@
-/* Configuração geral.
+﻿/* Configuração geral.
    - whatsapp: número da loja (apenas dígitos, com DDI 55).
    - apiBase: deixe "" se a API estiver na mesma URL do site (Vercel). */
 window.RELUX_CONFIG = {
@@ -126,7 +126,7 @@ window.RELUX.cardHTML = function (p) {
   return (
     '<div class="product" data-id="' + p.id + '">' +
       '<button class="fav-btn" type="button" data-fav="' + p.id + '" aria-label="Adicionar aos favoritos">' + window.RELUX.heartSVG + "</button>" +
-      '<a class="product-link" href="produto.html?id=' + p.id + '">' +
+      '<a class="product-link" href="/produto?id=' + p.id + '">' +
         '<div class="' + cls + '" data-tone="' + p.tone + '">' +
           window.RELUX.mediaInner(p, badge) +
         "</div>" +

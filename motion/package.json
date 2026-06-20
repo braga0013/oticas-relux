@@ -1,0 +1,26 @@
+{
+  "name": "motion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "remotion studio src/index.tsx",
+    "render": "remotion render src/index.tsx OticasRelux out/oticas-relux-9x16.mp4",
+    "render:square": "remotion render src/index.tsx OticasReluxSquare out/oticas-relux-1x1.mp4",
+    "preview": "remotion studio src/index.tsx --port 3001"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@remotion/cli": "^4.0.478",
+    "@remotion/player": "^4.0.478",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "remotion": "^4.0.478",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,4 +1,4 @@
-/* ÓTICAS RELUX — Minha Conta (Supabase Auth) */
+﻿/* ÓTICAS RELUX — Minha Conta (Supabase Auth) */
 (function () {
   "use strict";
   var A = window.RELUX_AUTH;
@@ -20,7 +20,7 @@
   function nextUrl() {
     var m = /[?&]next=([^&]+)/.exec(location.search);
     var nx = m ? decodeURIComponent(m[1]) : "";
-    return /^[\w.\-]+\.html(\?[\w%=&.\-]*)?$/.test(nx) ? nx : "";
+    return /^\/[\w.\-]+(\?[\w%=&.\-]*)?$/.test(nx) ? nx : "";
   }
   function goNext() { var nx = nextUrl(); if (nx) { location.href = nx; return true; } return false; }
 
@@ -75,7 +75,7 @@
     box.innerHTML = '<p style="color:var(--muted);font-size:.85rem">Carregando pedidos…</p>';
     A.getOrders().then(function(orders) {
       if (!orders.length) {
-        box.innerHTML = '<p class="acct-empty">Você ainda não fez pedidos. <a href="catalogo.html">Comece agora →</a></p>';
+        box.innerHTML = '<p class="acct-empty">Você ainda não fez pedidos. <a href="/catalogo">Comece agora →</a></p>';
         return;
       }
       box.innerHTML = orders.map(function(o) {
@@ -98,7 +98,7 @@
           '<div class="order-right">' +
             '<span class="order-status ' + cls + '">' + st + '</span>' +
             '<b>' + fmtBRL(o.total) + '</b>' +
-            (o.delivery_type !== 'loja' ? '<a href="pedido.html?numero=' + encodeURIComponent(o.numero) + '" style="font-size:.78rem;color:var(--gold-deep);text-decoration:none">Rastrear →</a>' : '') +
+            (o.delivery_type !== 'loja' ? '<a href="/pedido?numero=' + encodeURIComponent(o.numero) + '" style="font-size:.78rem;color:var(--gold-deep);text-decoration:none">Rastrear →</a>' : '') +
           '</div>' +
         '</div>';
       }).join("");

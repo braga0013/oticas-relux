@@ -1,4 +1,4 @@
-/* ÓTICAS RELUX — Sacola + Favoritos + Modal de Lentes */
+﻿/* ÓTICAS RELUX — Sacola + Favoritos + Modal de Lentes */
 (function () {
   "use strict";
   var CART_KEY = "relux-cart";
@@ -266,14 +266,14 @@
         '<footer class="drawer-foot" id="cartFoot">' +
           '<div class="drawer-subtotal"><span>Subtotal</span><strong id="cartSubtotal">R$ 0,00</strong></div>' +
           '<p class="drawer-note">Pague com Pix (5% off), cartão em até 10x ou na loja.</p>' +
-          '<a class="btn btn-primary btn-block btn-lg" id="cartCheckout" href="checkout.html">Finalizar compra</a>' +
+          '<a class="btn btn-primary btn-block btn-lg" id="cartCheckout" href="/checkout">Finalizar compra</a>' +
           '<button class="drawer-link" type="button" id="cartClear">Esvaziar sacola</button>' +
         '</footer>' +
       '</aside>' +
       /* FAV */
       '<aside class="drawer" id="favDrawer" aria-hidden="true" aria-label="Seus favoritos">' +
         '<header class="drawer-head"><h3>Favoritos <span class="drawer-count" id="favHeadCount"></span></h3>' +
-          '<a class="drawer-link" href="favoritos.html" style="margin-right:auto;font-size:.8rem;">Ver todos</a>' +
+          '<a class="drawer-link" href="/favoritos" style="margin-right:auto;font-size:.8rem;">Ver todos</a>' +
           '<button class="drawer-close" type="button" data-close aria-label="Fechar">' + closeIco() + '</button></header>' +
         '<div class="drawer-body" id="favBody"></div>' +
       '</aside>' +
@@ -297,7 +297,7 @@
         /* pequena espera: dá chance ao auth async inicializar */
         setTimeout(function() {
           var u2 = A && A.current();
-          if (!u2) location.href = "conta.html?next=checkout.html";
+          if (!u2) location.href = "/conta?next=checkout.html";
         }, 400);
       }
     });
@@ -548,10 +548,10 @@
         var frame = parseBRL(p.price);
         var priceDisplay = hasLens ? fmtBRL((frame + i.lens.lensPrice) * i.qty) : p.price;
         return '<div class="cart-item" data-id="' + p.id + '">' +
-          '<a class="ci-thumb" href="produto.html?id=' + p.id + '">' + thumbHTML(p) + "</a>" +
+          '<a class="ci-thumb" href="/produto?id=' + p.id + '">' + thumbHTML(p) + "</a>" +
           '<div class="ci-info">' +
             '<span class="ci-brand">' + p.brand + "</span>" +
-            '<a class="ci-name" href="produto.html?id=' + p.id + '">' + p.name + "</a>" +
+            '<a class="ci-name" href="/produto?id=' + p.id + '">' + p.name + "</a>" +
             lensTag(i.lens) +
             '<span class="ci-price">' + priceDisplay + "</span>" +
             '<div class="qty">' +
@@ -576,10 +576,10 @@
       body.innerHTML = fav.map(function (id) {
         var p = prod(id); if (!p) return "";
         return '<div class="cart-item" data-id="' + p.id + '">' +
-          '<a class="ci-thumb" href="produto.html?id=' + p.id + '">' + thumbHTML(p) + "</a>" +
+          '<a class="ci-thumb" href="/produto?id=' + p.id + '">' + thumbHTML(p) + "</a>" +
           '<div class="ci-info">' +
             '<span class="ci-brand">' + p.brand + "</span>" +
-            '<a class="ci-name" href="produto.html?id=' + p.id + '">' + p.name + "</a>" +
+            '<a class="ci-name" href="/produto?id=' + p.id + '">' + p.name + "</a>" +
             '<span class="ci-price">' + p.price + "</span>" +
             '<button class="btn btn-primary btn-sm" type="button" data-add="' + p.id + '">Adicionar à sacola</button>' +
           "</div>" +
@@ -594,7 +594,7 @@
     return '<div class="drawer-empty"><div class="de-ico">' +
       '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h13l5 5v5h-2M3 7v10h2M16 7v10M5 17a2 2 0 1 0 4 0 2 2 0 1 0-4 0Zm10 0a2 2 0 1 0 4 0 2 2 0 1 0-4 0Z"/></svg>' +
       "</div><h4>" + title + "</h4><p>" + sub + "</p>" +
-      '<a class="btn btn-ghost" href="index.html#destaques">Ver produtos</a></div>';
+      '<a class="btn btn-ghost" href="/#destaques">Ver produtos</a></div>';
   }
 
   /* ---------- badges + corações ---------- */
