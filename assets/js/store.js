@@ -9,12 +9,12 @@
   /* ---------- preços das lentes ---------- */
   var LENS_BASE = {
     "so-armacao":          0,
-    "sem-grau-filtro-azul": 150,
-    "grau-leve":           200,
-    "grau-moderado":       280,
-    "grau-alto":           380,
+    "sem-grau-filtro-azul": 100,
+    "grau-leve":           100,
+    "grau-moderado":       150,
+    "grau-alto":           200,
   };
-  var EXTRA_PRICE = { "antirreflexo": 80, "fotossensivel": 150, "filtro-azul-extra": 80 };
+  var EXTRA_PRICE = { "antirreflexo": 20, "fotossensivel": 50, "filtro-azul-extra": 50 };
   var LENS_LABEL  = {
     "so-armacao": "Só a armação", "sem-grau-filtro-azul": "Sem grau + Filtro Azul",
     "grau-leve": "Grau Leve", "grau-moderado": "Grau Moderado", "grau-alto": "Grau Alto",
@@ -187,8 +187,8 @@
             '<h3 class="lens-panel-title">Como deseja as lentes?</h3>' +
             '<div class="lens-opts">' +
               optBtn("so-armacao", "Só a armação", "+ R$ 0", "Sem lentes — você providencia as suas") +
-              optBtn("sem-grau-filtro-azul", "Sem grau + Filtro Azul", "+ R$ 150", "Proteção contra luz azul das telas digitais", true) +
-              optBtn("com-grau", "Com Grau", "a partir de R$ 200", "Lentes de correção visual com receita médica") +
+              optBtn("sem-grau-filtro-azul", "Sem grau + Filtro Azul", "+ R$ 100", "Proteção contra luz azul das telas digitais", true) +
+              optBtn("com-grau", "Com Grau", "a partir de R$ 100", "Lentes de correção visual com receita médica") +
             '</div>' +
           '</div>' +
 
@@ -196,9 +196,9 @@
           '<div class="lens-panel" data-panel="2">' +
             '<h3 class="lens-panel-title">Qual o nível do grau?</h3>' +
             '<div class="lens-opts">' +
-              optBtn("grau-leve", "Grau Leve", "+ R$ 200", "Até -2,00 ou +2,00 (esférico)") +
-              optBtn("grau-moderado", "Grau Moderado", "+ R$ 280", "De -2,25 a -4,00") +
-              optBtn("grau-alto", "Grau Alto", "+ R$ 380", "Acima de -4,00 ou astigmatismo elevado") +
+              optBtn("grau-leve", "Grau Leve", "+ R$ 100", "Até -2,00 ou +2,00 (esférico)") +
+              optBtn("grau-moderado", "Grau Moderado", "+ R$ 150", "De -2,25 a -4,00") +
+              optBtn("grau-alto", "Grau Alto", "+ R$ 200", "Acima de -4,00 ou astigmatismo elevado") +
             '</div>' +
           '</div>' +
 
@@ -207,9 +207,9 @@
             '<h3 class="lens-panel-title">Tratamentos adicionais</h3>' +
             '<p class="lens-panel-sub">Opcional — selecione um ou mais</p>' +
             '<div class="lens-opts">' +
-              toggleBtn("antirreflexo", "Antirreflexo", "+ R$ 80", "Reduz reflexos e cansaço visual") +
-              toggleBtn("fotossensivel", "Fotossensível", "+ R$ 150", "Escurece ao sol, clareia na sombra") +
-              toggleBtn("filtro-azul-extra", "Filtro de Luz Azul", "+ R$ 80", "Proteção para telas e ambientes digitais") +
+              toggleBtn("antirreflexo", "Antirreflexo", "+ R$ 20", "Reduz reflexos e cansaço visual") +
+              toggleBtn("fotossensivel", "Fotossensível", "+ R$ 50", "Escurece ao sol, clareia na sombra") +
+              toggleBtn("filtro-azul-extra", "Filtro de Luz Azul", "+ R$ 50", "Proteção para telas e ambientes digitais") +
             '</div>' +
           '</div>' +
 
@@ -462,6 +462,17 @@
     } else if (step === 2) {
       if (!LM.grau) { toast("Selecione o nível do grau para continuar"); return; }
       setLensStep(3);
+      /* Fotossensível só disponível para grau leve */
+      var fotoBtn = document.querySelector('[data-panel="3"] [data-opt="fotossensivel"]');
+      if (fotoBtn) {
+        var grauSemFoto = LM.grau === 'grau-moderado' || LM.grau === 'grau-alto';
+        fotoBtn.style.display = grauSemFoto ? 'none' : '';
+        if (grauSemFoto) {
+          fotoBtn.classList.remove('active');
+          LM.extras = LM.extras.filter(function(e) { return e !== 'fotossensivel'; });
+          updateLensTotal();
+        }
+      }
 
     } else if (step === 3) {
       setLensStep(4);

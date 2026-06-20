@@ -383,12 +383,29 @@
   }
   el("addSpecBtn").addEventListener("click", function () { addSpecRow("", ""); });
 
-  /* ── Upload helper ── */
+  /* ── Upload helper (com compressão para respeitar limite 1MB do Vercel) ── */
+  function compressImage(file, callback) {
+    var img = new Image();
+    var url = URL.createObjectURL(file);
+    img.onload = function () {
+      URL.revokeObjectURL(url);
+      var MAX = 1200; /* px no lado maior */
+      var scale = Math.min(1, MAX / Math.max(img.width, img.height));
+      var w = Math.round(img.width * scale);
+      var h = Math.round(img.height * scale);
+      var canvas = document.createElement("canvas");
+      canvas.width = w; canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL("image/jpeg", 0.82).split(",")[1], "image/jpeg");
+    };
+    img.onerror = function () { callback(null, null); };
+    img.src = url;
+  }
+
   function uploadFile(file, onSuccess, onError) {
     var a = getAuth() || {};
-    var reader = new FileReader();
-    reader.onload = function (ev) {
-      var base64 = ev.target.result.split(",")[1];
+    compressImage(file, function (base64, mime) {
+      if (!base64) { onError("Não foi possível processar a imagem."); return; }
       fetch(API, {
         method: "POST",
         headers: {
@@ -396,7 +413,7 @@
           "X-Admin-User": a.u || "",
           "X-Admin-Pass": a.p || "",
         },
-        body: JSON.stringify({ action: "upload", filename: file.name, base64: base64, mime: file.type }),
+        body: JSON.stringify({ action: "upload", filename: file.name.replace(/\.[^.]+$/, ".jpg"), base64: base64, mime: mime }),
       })
         .then(function (r) { return r.json(); })
         .then(function (d) {
@@ -404,8 +421,7 @@
           else onError(d.error || "Erro no upload.");
         })
         .catch(function (e) { onError(e.message); });
-    };
-    reader.readAsDataURL(file);
+    });
   }
 
   /* ── Salvar ── */

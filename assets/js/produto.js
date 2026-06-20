@@ -113,9 +113,11 @@
   /* botões: adicionar à sacola, favoritar, comprar agora */
   var add = el("pdpAdd"); if (add) add.setAttribute("data-add", p.id);
   var favBtn = el("pdpFav"); if (favBtn) favBtn.setAttribute("data-fav", p.id);
-  var buyMsg = "Olá! Quero comprar o " + p.name + " (" + p.brand + ") — " + p.price + ".";
   var buy = el("pdpBuy");
-  if (buy) buy.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(buyMsg);
+  if (buy) {
+    buy.removeAttribute("href");
+    buy.setAttribute("data-add", p.id);
+  }
 
   /* relacionados */
   var rel = el("relatedGrid");
