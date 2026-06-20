@@ -13,6 +13,19 @@
   function payMethod() { var r = document.querySelector('input[name="pagamento"]:checked'); return r ? r.value : "pix"; }
   function delivery() { var r = document.querySelector('input[name="entrega"]:checked'); return r ? r.value : "casa"; }
 
+  /* ---------- helper: descrição da lente ---------- */
+  var LTYPE  = { 'sem-grau-filtro-azul': 'Filtro Azul', 'com-grau': 'Com Grau' };
+  var LGRAU  = { 'grau-leve': 'Leve', 'grau-moderado': 'Moderado', 'grau-alto': 'Alto' };
+  var LEXTRA = { 'antirreflexo': 'Antirreflexo', 'fotossensivel': 'Fotossensível', 'filtro-azul-extra': 'Filtro Azul' };
+  function lensDesc(lens) {
+    if (!lens || lens.type === 'so-armacao') return '';
+    var t = LTYPE[lens.type] || lens.type;
+    if (lens.grau) t += ' ' + (LGRAU[lens.grau] || lens.grau);
+    var ex = (lens.extras || []).map(function(e) { return LEXTRA[e] || e; });
+    if (ex.length) t += ' + ' + ex.join(', ');
+    return t;
+  }
+
   /* ---------- resumo ---------- */
   function items() {
     var c = R.getCart ? R.getCart() : [];
@@ -231,7 +244,7 @@
     var pm = payMethod();
     var disc = pm === "pix" ? sub * PIX_OFF : 0;
     var frete = delivery() === "loja" ? 0 : freteAtual;
-    var lines = items().map(function (it) { return "• " + it.qty + "x " + it.p.name + " (" + it.p.brand + ") — " + it.p.price; });
+    var lines = items().map(function (it) { var ld = lensDesc(it.lens); return "• " + it.qty + "x " + it.p.name + " (" + (it.p.brand || "") + ") — " + fmt(itemPrice(it)) + (ld ? " [Lente: " + ld + "]" : ""); });
     var tipoFrete = freteMethod();
     var entregaTxt = delivery() === "loja" ? "Retirar na loja"
       : "Receber em casa (" + tipoFrete + ")\n" + val("rua") + ", " + val("numero") + (val("comp") ? " (" + val("comp") + ")" : "") + " - " + val("bairro") + ", " + val("cidade") + "/" + val("uf") + " - CEP " + val("cep");
@@ -447,7 +460,9 @@
   function sendOrderEmail(o, status) {
     try {
       var its = items().map(function (it) {
-        return { name: it.p.name + (it.p.brand ? " — " + it.p.brand : ""), qty: it.qty, price: fmt(itemPrice(it)) };
+        var ld = lensDesc(it.lens);
+        var nm = it.p.name + (ld ? ' (' + ld + ')' : '') + (it.p.brand ? " — " + it.p.brand : "");
+        return { name: nm, qty: it.qty, price: fmt(itemPrice(it)) };
       });
       var pm = o.pm;
       var parc = (el("ccparc") && parseInt(el("ccparc").value, 10)) || 1;
@@ -481,7 +496,8 @@
   function saveOrder(o, status, paymentId) {
     var apiBase = (window.RELUX_CONFIG && window.RELUX_CONFIG.apiBase) || "";
     var its = items().map(function (it) {
-      return { id: it.p.id, name: it.p.name, brand: it.p.brand || "", qty: it.qty, price: itemPrice(it) };
+      var ld = it.lens && it.lens.type !== 'so-armacao' ? { type: it.lens.type, grau: it.lens.grau || null, extras: it.lens.extras || [] } : null;
+      return { id: it.p.id, name: it.p.name, brand: it.p.brand || "", qty: it.qty, price: itemPrice(it), lens: ld };
     });
     /* inclui user_id se cliente estiver logado */
     var userId = (window.RELUX_AUTH && window.RELUX_AUTH.current() && window.RELUX_AUTH.current().id) || null;
