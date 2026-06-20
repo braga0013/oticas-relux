@@ -152,7 +152,6 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 .nav-brand { display: inline-flex; align-items: center; }
 .brand-logo { height: 38px; width: auto; display: block; border-radius: 6px; }
 .brand-logo-footer { height: 52px; }
-[data-theme="dark"] .brand-logo { background: rgba(255,255,255,0.9); padding: 3px 8px; border-radius: 8px; }
 
 .nav-links { display: flex; gap: 4px; }
 .nav-links a {
@@ -270,7 +269,7 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 .visual-core.center { aspect-ratio: 4 / 5; }
 .hero-eye { width: 64%; filter: drop-shadow(0 18px 40px rgba(0,0,0,0.4)); animation: floaty 7s var(--ease-inout) infinite; }
 .hero-eye.lg { width: 72%; }
-.hero-logo { mix-blend-mode: multiply; filter: none; }
+.hero-logo { }
 
 @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
 
