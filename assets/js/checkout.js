@@ -16,9 +16,10 @@
   /* ---------- resumo ---------- */
   function items() {
     var c = R.getCart ? R.getCart() : [];
-    return c.map(function (i) { var p = prod(i.id); return p ? { p: p, qty: i.qty } : null; }).filter(Boolean);
+    return c.map(function (i) { var p = prod(i.id); return p ? { p: p, qty: i.qty, lens: i.lens || null } : null; }).filter(Boolean);
   }
-  function subtotal() { return items().reduce(function (s, it) { return s + parseBRL(it.p.price) * it.qty; }, 0); }
+  function itemPrice(it) { return parseBRL(it.p.price) + (it.lens ? (it.lens.lensPrice || 0) : 0); }
+  function subtotal() { return items().reduce(function (s, it) { return s + itemPrice(it) * it.qty; }, 0); }
 
   function thumb(p) {
     return p.img ? '<img src="' + p.img + '" alt="" loading="lazy">' : '<svg viewBox="0 0 200 80"><use href="#' + p.shape + '"/></svg>';
@@ -32,9 +33,11 @@
       el("coSubmit").disabled = true; el("coSubmit").style.opacity = ".5"; el("coSubmit").style.pointerEvents = "none";
     } else {
       box.innerHTML = its.map(function (it) {
-        var line = parseBRL(it.p.price) * it.qty;
+        var unit = itemPrice(it);
+        var line = unit * it.qty;
+        var lensTag = it.lens && it.lens.lensPrice > 0 ? ' <span style="font-size:.72rem;color:var(--muted)">+ lente</span>' : '';
         return '<div class="sum-item"><div class="sum-thumb">' + thumb(it.p) + "</div>" +
-          '<div class="sum-info"><div class="sum-name">' + it.p.name + "</div><div class=\"sum-qty\">" + it.qty + " × " + it.p.price + "</div></div>" +
+          '<div class="sum-info"><div class="sum-name">' + it.p.name + lensTag + "</div><div class=\"sum-qty\">" + it.qty + " × " + fmt(unit) + "</div></div>" +
           '<div class="sum-line">' + fmt(line) + "</div></div>";
       }).join("");
     }
@@ -444,7 +447,7 @@
   function sendOrderEmail(o, status) {
     try {
       var its = items().map(function (it) {
-        return { name: it.p.name + (it.p.brand ? " — " + it.p.brand : ""), qty: it.qty, price: it.p.price };
+        return { name: it.p.name + (it.p.brand ? " — " + it.p.brand : ""), qty: it.qty, price: fmt(itemPrice(it)) };
       });
       var pm = o.pm;
       var parc = (el("ccparc") && parseInt(el("ccparc").value, 10)) || 1;
@@ -478,7 +481,7 @@
   function saveOrder(o, status, paymentId) {
     var apiBase = (window.RELUX_CONFIG && window.RELUX_CONFIG.apiBase) || "";
     var its = items().map(function (it) {
-      return { id: it.p.id, name: it.p.name, brand: it.p.brand || "", qty: it.qty, price: parseBRL(it.p.price) };
+      return { id: it.p.id, name: it.p.name, brand: it.p.brand || "", qty: it.qty, price: itemPrice(it) };
     });
     /* inclui user_id se cliente estiver logado */
     var userId = (window.RELUX_AUTH && window.RELUX_AUTH.current() && window.RELUX_AUTH.current().id) || null;
