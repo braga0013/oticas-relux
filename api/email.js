@@ -150,7 +150,7 @@ module.exports = async function handler(req, res) {
     const r = await fetch(RESEND_API, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + KEY },
-      body: JSON.stringify({ from: "Óticas Relux <onboarding@resend.dev>", to: [to], subject, html }),
+      body: JSON.stringify({ from: "Óticas Relux <" + (process.env.EMAIL_FROM || "onboarding@resend.dev") + ">", to: [to], subject, html }),
     });
     return r.json();
   }

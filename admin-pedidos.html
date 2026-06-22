@@ -308,7 +308,7 @@
               '<tr style="background:#f8f8f8">' +
               '<td style="padding:8px 12px;color:#111;font-weight:600">'+(it.qty>1?it.qty+'× ':'')+it.name+(it.brand?' <span style="color:#666;font-weight:400">— '+it.brand+'</span>':'')+
               (it.lens&&it.lens.type?'<br><span style="font-size:.78rem;color:#d97706;font-weight:400">Lente: '+
-                (function(l){var t={'sem-grau-filtro-azul':'Filtro Azul','com-grau':'Com Grau'};var g={'grau-leve':'Leve','grau-moderado':'Moderado','grau-alto':'Alto'};var e={'antirreflexo':'Antirreflexo','fotossensivel':'Fotossensível','filtro-azul-extra':'Filtro Azul'};var s=(t[l.type]||l.type)+(l.grau?' '+(g[l.grau]||l.grau):'');var ex=(l.extras||[]).map(function(x){return e[x]||x;});return ex.length?s+' + '+ex.join(', '):s;})(it.lens)+'</span>':'')
+                (function(l){var t={'sem-grau-filtro-azul':'Sem Grau','com-grau':'Com Grau'};var g={'grau-leve':'Leve','grau-moderado':'Moderado','grau-alto':'Alto'};var e={'antirreflexo':'Antirreflexo','fotossensivel':'Fotossensível','filtro-azul-extra':'Filtro Azul'};var s=(t[l.type]||l.type)+(l.grau?' '+(g[l.grau]||l.grau):'');var ex=(l.extras||[]).map(function(x){return e[x]||x;});return ex.length?s+' + '+ex.join(', '):s;})(it.lens)+'</span>':'')
               +'</td>' +
               '<td style="padding:8px 12px;color:#111;font-weight:700;text-align:right;white-space:nowrap">'+fmtBRL(lineTotal)+'</td>' +
               '</tr></table>';
