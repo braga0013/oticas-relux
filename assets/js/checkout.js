@@ -529,7 +529,8 @@
         payment_status:   status === "aprovado" ? "approved" : "pending",
         status:           status === "aprovado" ? "pago" : "aguardando_pagamento",
       }),
-    }).catch(function () {});
+    }).then(function(r){ return r.ok ? r.json() : r.json().then(function(e){ console.error("[saveOrder] erro:", e); }); })
+      .catch(function(e){ console.error("[saveOrder] erro de rede:", e); });
 
     /* mantém cópia local para dashboard.html */
     var u = window.RELUX_AUTH && window.RELUX_AUTH.current();
