@@ -123,6 +123,41 @@ function buildHtml(o) {
   );
 }
 
+var STATUS_INFO = {
+  pago:                 { icon: "✅", label: "Pagamento confirmado",  msg: "Recebemos seu pagamento! Estamos preparando seu pedido com cuidado." },
+  em_preparo:           { icon: "🔧", label: "Em preparação",         msg: "Seu pedido está sendo preparado pela nossa equipe." },
+  enviado:              { icon: "🚚", label: "Pedido enviado",        msg: "Seu pedido saiu para entrega! Em breve chegará até você." },
+  entregue:             { icon: "📦", label: "Pedido entregue",       msg: "Seu pedido foi entregue. Obrigado pela preferência na Óticas Relux!" },
+  cancelado:            { icon: "❌", label: "Pedido cancelado",      msg: "Seu pedido foi cancelado. Entre em contato conosco se tiver dúvidas." },
+  aguardando_pagamento: { icon: "⏳", label: "Aguardando pagamento",  msg: "Seu pedido foi gerado. Efetue o pagamento para prosseguirmos." },
+};
+
+function buildStatusHtml(num, status, customerName) {
+  var info = STATUS_INFO[status] || { icon: "📋", label: status, msg: "O status do seu pedido foi atualizado." };
+  return (
+    '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Atualização do Pedido — Óticas Relux</title></head>' +
+    '<body style="margin:0;padding:0;background:#f5f5f5;font-family:\'Helvetica Neue\',Helvetica,Arial,sans-serif">' +
+    '<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 0"><tr><td align="center">' +
+    '<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">' +
+    '<tr><td style="background:#0a0a0a;border-radius:12px 12px 0 0;padding:28px 32px">' +
+    '<span style="font-size:22px;font-weight:800;color:#fff;letter-spacing:.5px">ÓTICAS RELUX</span>' +
+    '</td></tr>' +
+    '<tr><td style="background:#fff;padding:36px 32px;text-align:center">' +
+    '<p style="font-size:48px;margin:0 0 12px">' + info.icon + '</p>' +
+    '<p style="font-size:22px;font-weight:700;color:#0a0a0a;margin:0 0 8px">' + info.label + '</p>' +
+    '<p style="font-size:14px;color:#666;margin:0 0 24px">Pedido <strong style="color:#d97706">' + esc(num) + '</strong></p>' +
+    '<div style="background:#fafafa;border:1px solid #eee;border-radius:10px;padding:20px 24px;text-align:left">' +
+    '<p style="margin:0;font-size:15px;color:#333">Olá, <strong>' + esc(customerName || "cliente") + '</strong>!</p>' +
+    '<p style="margin:12px 0 0;font-size:14px;color:#555;line-height:1.6">' + info.msg + '</p>' +
+    '</div>' +
+    '</td></tr>' +
+    '<tr><td style="background:#0a0a0a;border-radius:0 0 12px 12px;padding:20px 32px;text-align:center">' +
+    '<p style="margin:0;font-size:12px;color:#888">Este e-mail foi gerado automaticamente pela <strong style="color:#ccc">Óticas Relux</strong>.</p>' +
+    '</td></tr>' +
+    '</table></td></tr></table></body></html>'
+  );
+}
+
 module.exports = async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -136,17 +171,8 @@ module.exports = async function handler(req, res) {
   catch (e) { return res.status(400).json({ error: "JSON inválido" }); }
 
   function validEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(e || "")); }
-  const storeEmail = process.env.STORE_EMAIL || "";
-  if (!storeEmail || !validEmail(storeEmail)) {
-    return res.status(503).json({ error: "STORE_EMAIL não configurado ou inválido no servidor." });
-  }
-  const rawCustomerEmail = body.customer && body.customer.email;
-  const customerEmail = rawCustomerEmail && validEmail(rawCustomerEmail) ? rawCustomerEmail : null;
-  const html = buildHtml(body);
-  const storeSubject = "🛍️ Novo pedido " + (body.num || "") + " — Óticas Relux";
-  const customerSubject = "✅ Pedido " + (body.num || "") + " recebido — Óticas Relux";
 
-  async function sendEmail(to, subject) {
+  async function sendEmail(to, subject, html) {
     const r = await fetch(RESEND_API, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + KEY },
@@ -155,15 +181,38 @@ module.exports = async function handler(req, res) {
     return r.json();
   }
 
-  try {
-    /* notificação para a loja */
-    const storeResult = await sendEmail(storeEmail, storeSubject);
-
-    /* confirmação para o cliente (se tiver e-mail e for diferente da loja) */
-    if (customerEmail && customerEmail !== storeEmail) {
-      sendEmail(customerEmail, customerSubject).catch(function() {});
+  /* ── email de atualização de status (disparado pelo admin) ── */
+  if (body.type === "status-update") {
+    var toEmail = body.customerEmail;
+    if (!toEmail || !validEmail(toEmail)) return res.status(400).json({ error: "E-mail do cliente inválido." });
+    var html = buildStatusHtml(body.num, body.status, body.customerName);
+    var info = STATUS_INFO[body.status] || { label: body.status };
+    var subject = info.icon + " Pedido " + (body.num || "") + " — " + info.label + " — Óticas Relux";
+    try {
+      var r = await sendEmail(toEmail, subject, html);
+      if (!r.id && r.message) return res.status(400).json({ error: r.message });
+      return res.status(200).json({ ok: true, id: r.id });
+    } catch (e) {
+      return res.status(500).json({ error: "Falha ao enviar e-mail de status" });
     }
+  }
 
+  /* ── email de novo pedido (disparado pelo checkout) ── */
+  const storeEmail = process.env.STORE_EMAIL || "";
+  if (!storeEmail || !validEmail(storeEmail)) {
+    return res.status(503).json({ error: "STORE_EMAIL não configurado ou inválido no servidor." });
+  }
+  const rawCustomerEmail = body.customer && body.customer.email;
+  const customerEmail = rawCustomerEmail && validEmail(rawCustomerEmail) ? rawCustomerEmail : null;
+  const orderHtml = buildHtml(body);
+  const storeSubject = "🛍️ Novo pedido " + (body.num || "") + " — Óticas Relux";
+  const customerSubject = "✅ Pedido " + (body.num || "") + " recebido — Óticas Relux";
+
+  try {
+    const storeResult = await sendEmail(storeEmail, storeSubject, orderHtml);
+    if (customerEmail && customerEmail !== storeEmail) {
+      sendEmail(customerEmail, customerSubject, orderHtml).catch(function() {});
+    }
     if (!storeResult.id && storeResult.message) {
       return res.status(400).json({ error: storeResult.message, detail: storeResult });
     }

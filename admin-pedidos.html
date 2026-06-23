@@ -351,7 +351,17 @@
         api({ action: "order-update", numero: p.numero, data: { status: ns } })
           .then(function() {
             p.status = ns; renderStats(); renderTable();
-            toast("Status atualizado!"); closeDrawer();
+            toast("Status atualizado!");
+            /* dispara email para o cliente se tiver email e status relevante */
+            var skipEmail = ["aguardando_pagamento"];
+            if (p.customer_email && !skipEmail.includes(ns)) {
+              fetch("/api/email", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ type: "status-update", num: p.numero, status: ns, customerEmail: p.customer_email, customerName: p.customer_name })
+              }).catch(function(){});
+            }
+            closeDrawer();
           }).catch(function(e){ toast(e.message, true); });
       });
 
