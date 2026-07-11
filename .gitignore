@@ -17,3 +17,7 @@ skills-lock.json
 Thumbs.db
 
 .vercel
+
+# Vídeo original (não comprimido) — manter só a versão web em assets/vids/
+assets/vids/*.mov
+assets/vids/*.MOV

@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre — Óticas Relux</title>
+  <meta name="description" content="Conheça a história, os valores e a equipe por trás da Óticas Relux." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="icon" href="assets/img/logo-relux.png" type="image/png" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+
+  <!-- ░░░ Nav ░░░ -->
+  <header class="nav-wrap" id="navWrap">
+    <nav class="nav" aria-label="Navegação principal">
+      <a href="/" class="nav-brand" aria-label="Óticas Relux — início">
+        <img src="assets/img/logo-relux.png" alt="Óticas Relux" class="brand-logo" />
+      </a>
+      <form class="nav-search js-search-form" role="search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input class="js-search-input" type="search" placeholder="Buscar óculos, marcas, lentes..." aria-label="Buscar produtos" />
+      </form>
+      <div class="nav-actions">
+        <a class="icon-btn account-btn" id="accountBtn" href="/conta" aria-label="Entrar ou criar conta">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+          <span class="acct-name" id="acctName"></span>
+        </a>
+        <button class="icon-btn" id="favBtn" type="button" aria-label="Favoritos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.3C.7 9 1.6 5.7 4.7 4.8 6.8 4.2 9 5 12 8c3-3 5.2-3.8 7.3-3.2 3.1.9 4 4.2 2.7 6.9C19.5 16.4 12 21 12 21Z"/></svg>
+          <span class="count" id="favCount">0</span>
+        </button>
+        <button class="icon-btn" id="cartBtn" type="button" aria-label="Sacola">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="21" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="21" r="1" fill="currentColor" stroke="none"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="count" id="cartCount">0</span>
+        </button>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Alternar tema claro e escuro" title="Alternar tema">
+          <svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2" />
+            <g stroke-linecap="round">
+              <line x1="12" y1="2.5" x2="12" y2="5" /><line x1="12" y1="19" x2="12" y2="21.5" />
+              <line x1="2.5" y1="12" x2="5" y2="12" /><line x1="19" y1="12" x2="21.5" y2="12" />
+              <line x1="5.2" y1="5.2" x2="6.9" y2="6.9" /><line x1="17.1" y1="17.1" x2="18.8" y2="18.8" />
+              <line x1="18.8" y1="5.2" x2="17.1" y2="6.9" /><line x1="6.9" y1="17.1" x2="5.2" y2="18.8" />
+            </g>
+          </svg>
+          <svg class="ico-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path d="M20 14.5A8 8 0 0 1 9.5 4 7 7 0 1 0 20 14.5Z" />
+          </svg>
+        </button>
+        <a class="btn btn-primary nav-cta" href="/#contato">
+          <span>Agendar</span>
+          <span class="btn-orb" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M7 17 17 7M9 7h8v8" /></svg></span>
+        </a>
+        <button class="hamburger" id="hamburger" type="button" aria-label="Abrir menu" aria-expanded="false"><span></span><span></span></button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <form class="js-search-form mobile-search" role="search"><input class="js-search-input" type="search" placeholder="Buscar..." aria-label="Buscar" /></form>
+    <a href="/catalogo?cat=Óculos de Sol" data-link>Óculos de Sol</a>
+    <a href="/catalogo?cat=Óculos de Grau" data-link>Óculos de Grau</a>
+    <a href="/catalogo?cat=Lentes de Contato" data-link>Lentes de Contato</a>
+    <a href="/catalogo?cat=Linha Infantil" data-link>Linha Infantil</a>
+    <a href="/#contato" data-link>Contato</a>
+    <a class="btn btn-primary" href="/#contato" data-link>Agendar atendimento</a>
+  </div>
+
+  <main id="topo">
+    <!-- ░░░ ABOUT HERO ░░░ -->
+    <section class="section about-hero-section">
+      <div class="container">
+        <nav class="crumb" aria-label="Você está aqui">
+          <a href="/">Início</a> / <span>Sobre</span>
+        </nav>
+        <div class="about-hero reveal">
+          <span class="eyebrow"><i></i> A Relux</span>
+          <h1 class="about-hero-title">
+            Um óculos bom<br/>
+            não se nota —<br/>
+            <span class="grad">ele desaparece no rosto.</span>
+          </h1>
+          <p class="about-hero-lead">
+            A Relux nasceu em Porto Alegre com uma ideia simples: comprar óculos deveria
+            ser um processo de cuidado, não de venda. Curadoria pessoal, técnica de verdade
+            e um atendimento que enxerga cada cliente por inteiro.
+          </p>
+        </div>
+
+        <div class="hero-stats about-stats reveal" data-delay="120">
+          <div><span class="stat-n">7k+</span><span class="stat-l">clientes atendidos</span></div>
+          <div class="div"></div>
+          <div><span class="stat-n">+40</span><span class="stat-l">marcas premium</span></div>
+          <div class="div"></div>
+          <div><span class="stat-n">10x</span><span class="stat-l">sem juros</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ░░░ MANIFESTO ░░░ -->
+    <section class="section section-alt">
+      <div class="container">
+        <blockquote class="manifesto reveal">
+          “Não vendemos armações. Construímos a forma<br class="br-desktop"/>
+          como o mundo vai olhar para você — e como você vai olhar de volta.”
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- ░░░ TIMELINE ░░░ -->
+    <section class="section" id="historia">
+      <div class="container">
+        <header class="section-head reveal">
+          <span class="eyebrow"><i></i> Nossa trajetória</span>
+          <h2 class="section-title">De uma loja a uma referência<br/>em ótica premium</h2>
+        </header>
+
+        <ol class="timeline">
+          <li class="timeline-item reveal">
+            <span class="timeline-year">2016</span>
+            <div class="timeline-body">
+              <h3>Primeira loja, em Porto Alegre</h3>
+              <p>Abrimos as portas no bairro Cristo Redentor com uma proposta direta: atendimento técnico de verdade, sem pressa e sem empurroterapia.</p>
+            </div>
+          </li>
+          <li class="timeline-item reveal" data-delay="80">
+            <span class="timeline-year">2019</span>
+            <div class="timeline-body">
+              <h3>Curadoria de marcas premium</h3>
+              <p>Passamos a trazer marcas internacionais selecionadas peça a peça, com foco em design e conforto de longa duração.</p>
+            </div>
+          </li>
+          <li class="timeline-item reveal" data-delay="160">
+            <span class="timeline-year">2022</span>
+            <div class="timeline-body">
+              <h3>Exame de vista gratuito e prova virtual</h3>
+              <p>Lançamos o exame sem custo e a prova virtual em casa, aproximando a experiência de loja física do digital.</p>
+            </div>
+          </li>
+          <li class="timeline-item reveal" data-delay="240">
+            <span class="timeline-year">2026</span>
+            <div class="timeline-body">
+              <h3>Mais de 7 mil olhares cuidados</h3>
+              <p>Hoje seguimos com o mesmo princípio do primeiro dia: cada cliente merece uma curadoria pensada só para ele.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ░░░ VALUES ░░░ -->
+    <section class="section section-alt" id="valores">
+      <div class="container">
+        <header class="section-head reveal">
+          <span class="eyebrow"><i></i> O que nos guia</span>
+          <h2 class="section-title">Princípios que não<br/>abrimos mão</h2>
+        </header>
+
+        <div class="feature-grid">
+          <div class="feature reveal">
+            <div class="feature-ico">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+            <h3>Curadoria pessoal</h3>
+            <p>Cada indicação parte do seu rosto, seu estilo de vida e sua rotina — nunca de um catálogo genérico.</p>
+          </div>
+          <div class="feature reveal" data-delay="80">
+            <div class="feature-ico">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <h3>Ótica técnica de verdade</h3>
+            <p>Optometristas de verdade, equipamentos calibrados e lentes de fabricantes líderes — sem atalhos.</p>
+          </div>
+          <div class="feature reveal" data-delay="160">
+            <div class="feature-ico">
+              <svg viewBox="0 0 24 24" width="22" height="22"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg>
+            </div>
+            <h3>Transparência de ponta a ponta</h3>
+            <p>Preço, prazo e condições claros desde a primeira conversa — sem letra miúda.</p>
+          </div>
+          <div class="feature reveal" data-delay="240">
+            <div class="feature-ico">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z"/></svg>
+            </div>
+            <h3>Cuidado que continua</h3>
+            <p>Garantia, ajustes e assistência não terminam na saída da loja — seguem enquanto você usar o óculos.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ░░░ TEAM ░░░ -->
+    <section class="section" id="equipe">
+      <div class="container">
+        <header class="section-head reveal">
+          <span class="eyebrow"><i></i> Quem cuida do seu olhar</span>
+          <h2 class="section-title">A equipe por trás<br/>da Relux</h2>
+        </header>
+
+        <div class="team-grid">
+          <div class="team-card reveal">
+            <span class="team-avatar">C</span>
+            <h3 class="team-name">Camila Duarte</h3>
+            <span class="team-role">Fundadora &amp; Direção de Estilo</span>
+          </div>
+          <div class="team-card reveal" data-delay="80">
+            <span class="team-avatar">H</span>
+            <h3 class="team-name">Dr. Henrique Aguiar</h3>
+            <span class="team-role">Optometrista Responsável</span>
+          </div>
+          <div class="team-card reveal" data-delay="160">
+            <span class="team-avatar">B</span>
+            <h3 class="team-name">Bruna Salles</h3>
+            <span class="team-role">Especialista em Lentes</span>
+          </div>
+          <div class="team-card reveal" data-delay="240">
+            <span class="team-avatar">D</span>
+            <h3 class="team-name">Diego Ferraz</h3>
+            <span class="team-role">Experiência do Cliente</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ░░░ FINAL CTA ░░░ -->
+    <section class="section" id="contato-sobre">
+      <div class="container">
+        <div class="cta-shell reveal">
+          <div class="cta-core">
+            <div class="cta-glow" aria-hidden="true"></div>
+            <span class="eyebrow center"><i></i> Vamos cuidar do seu olhar</span>
+            <h2 class="cta-title">Conheça a Relux<br/>de perto</h2>
+            <p class="cta-sub">Agende um horário e venha conversar com quem entende de verdade de óptica.</p>
+            <div class="cta-actions">
+              <a class="btn btn-primary btn-lg" href="https://wa.me/5551995963008?text=Ol%C3%A1!%20Vim%20pela%20p%C3%A1gina%20Sobre%20e%20quero%20agendar%20um%20atendimento." target="_blank" rel="noopener">
+                <span>Falar no WhatsApp</span>
+                <span class="btn-orb" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+              </a>
+              <a class="btn btn-ghost btn-lg" href="tel:+5551995963008">(51) 99596-3008</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ░░░ Footer ░░░ -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="nav-brand" aria-label="Óticas Relux">
+          <img src="assets/img/logo-relux.png" alt="Óticas Relux" class="brand-logo brand-logo-footer" />
+        </a>
+        <p>Encontre seu óculos com quem entende de verdade.</p>
+        <div class="socials">
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8a1 1 0 0 1 1-1Z"/></svg></a>
+          <a href="https://wa.me/5551995963008" aria-label="WhatsApp"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M3 21l1.6-4.8A8 8 0 1 1 7.8 19.4L3 21Z"/><path d="M8.5 8.5c0 4 3 7 7 7"/></svg></a>
+        </div>
+      </div>
+      <nav class="footer-col" aria-label="Produtos">
+        <h4>Produtos</h4>
+        <a href="/#colecoes">Óculos de Sol</a>
+        <a href="/#colecoes">Óculos de Grau</a>
+        <a href="/#colecoes">Lentes de Contato</a>
+        <a href="/#colecoes">Linha Infantil</a>
+      </nav>
+      <nav class="footer-col" aria-label="Serviços">
+        <h4>Serviços</h4>
+        <a href="/#servicos">Exame de vista</a>
+        <a href="/#servicos">Prova virtual</a>
+        <a href="/#servicos">Garantia Relux</a>
+        <a href="/#servicos">Entrega expressa</a>
+      </nav>
+      <nav class="footer-col" aria-label="Institucional">
+        <h4>A Relux</h4>
+        <a href="/sobre">Sobre nós</a>
+        <a href="/#contato">Contato</a>
+        <a href="#">Políticas de privacidade</a>
+        <a href="#">Trocas e devoluções</a>
+      </nav>
+    </div>
+    <div class="container footer-bottom">
+      <span>© <span id="year"></span> Óticas Relux. Todos os direitos reservados.</span>
+      <span>Feito com cuidado para o seu olhar.</span>
+    </div>
+  </footer>
+
+  <a class="wa-float" href="https://wa.me/5551995963008?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20%C3%93ticas%20Relux." target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
+    <svg viewBox="0 0 24 24" width="26" height="26"><path d="M3 21l1.6-4.8A8 8 0 1 1 7.8 19.4L3 21Z"/><path d="M8.5 8.5c0 4 3 7 7 7"/></svg>
+  </a>
+
+  <script src="assets/js/products.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

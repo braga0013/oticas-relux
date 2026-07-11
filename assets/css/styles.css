@@ -102,6 +102,7 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 }
 .btn:active { transform: scale(0.97); }
 .btn-lg { padding: 16px 26px; font-size: 1rem; }
+.hero-cta-main { padding: 20px 34px; font-size: 1.12rem; }
 .btn-block { width: 100%; justify-content: center; margin-top: 14px; }
 
 .btn-primary {
@@ -132,25 +133,24 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 .nav-wrap {
   position: fixed; top: 0; left: 0; right: 0; z-index: 55;
   display: flex; justify-content: center;
-  padding: 18px 16px;
-  transition: padding 0.4s var(--ease-out);
-}
-.nav {
-  width: 100%; max-width: var(--maxw);
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 18px; padding: 10px 12px 10px 18px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--bg-2) 72%, transparent);
-  border: 1px solid var(--hair);
-  backdrop-filter: blur(18px) saturate(1.4);
-  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  padding: 0;
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--hair);
   box-shadow: var(--shadow);
   transition: background 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
 }
-.nav-wrap.scrolled .nav { box-shadow: 0 18px 50px -24px rgba(0,0,0,0.55); }
+.nav {
+  width: 100%; max-width: 1400px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 28px; padding: 14px 32px;
+  border-radius: 0;
+  background: none;
+  border: none;
+}
+.nav-wrap.scrolled { box-shadow: 0 18px 50px -24px rgba(0,0,0,0.55); }
 
 .nav-brand { display: inline-flex; align-items: center; }
-.brand-logo { height: 38px; width: auto; display: block; border-radius: 6px; }
+.brand-logo { height: 60px; width: auto; display: block; border-radius: 6px; }
 .brand-logo-footer { height: 52px; }
 
 .nav-links { display: flex; gap: 4px; }
@@ -220,12 +220,26 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
    HERO
    ============================================================ */
 .hero { position: relative; padding: 168px 0 70px; overflow: hidden; }
+.hero-video-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.hero-video {
+  position: absolute; top: 50%; left: 50%; width: 100%; height: 100%; object-fit: cover;
+  transform: translate(-50%, -50%) scale(1.1);
+  filter: blur(6px) saturate(1.1);
+}
+.hero-video-scrim { position: absolute; inset: 0; background: var(--bg); opacity: 0.68; }
+[data-theme="light"] .hero-video-scrim { opacity: 0.8; }
 .hero-glow {
   position: absolute; top: -10%; right: -5%; width: 60vw; height: 60vw; max-width: 760px; max-height: 760px;
   background: radial-gradient(circle at center, var(--glow), transparent 62%);
   filter: blur(20px); pointer-events: none; z-index: 0;
 }
 .hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 48px; align-items: center; }
+
+.hero-copy { position: relative; z-index: 2; }
+.hero-title--plain, .hero-lead, .stat-n, .stat-l {
+  text-shadow: 0 0 18px var(--bg), 0 0 34px var(--bg), 0 2px 6px var(--bg);
+}
+.eyebrow { background: var(--bg); }
 
 .eyebrow {
   display: inline-flex; align-items: center; gap: 8px;
@@ -241,7 +255,8 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
   background: linear-gradient(105deg, var(--gold-bright), var(--gold) 45%, var(--gold-deep));
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
-.hero-lead { font-size: clamp(1rem, 1.4vw, 1.18rem); color: var(--ink-soft); max-width: 30em; margin: 22px 0 0; }
+.hero-title--plain { font-size: clamp(2.3rem, 5vw, 3.4rem); color: var(--ink); }
+.hero-lead { font-size: clamp(1.1rem, 1.6vw, 1.3rem); color: var(--ink-soft); max-width: 30em; margin: 22px 0 0; }
 .hero-lead b { color: var(--ink); }
 .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
 
@@ -250,6 +265,7 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 .hero-stats .div { width: 1px; height: 34px; background: var(--hair); }
 .stat-n { font-family: "Bricolage Grotesque", sans-serif; font-size: 1.7rem; font-weight: 700; color: var(--ink); }
 .stat-l { font-size: 0.78rem; color: var(--muted); }
+.hero-stats .stat-l { color: var(--ink); }
 
 /* hero visual — double bezel */
 .visual-shell {
@@ -299,8 +315,12 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 /* ============================================================
    SECTIONS
    ============================================================ */
-.section { padding: 96px 0; }
-.section-alt { background: linear-gradient(180deg, transparent, var(--surface), transparent); }
+.section { padding: 140px 0; }
+.section-alt {
+  background: var(--bg-2);
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+}
 .section-head { max-width: 40em; margin-bottom: 44px; }
 .section-head.row { display: flex; align-items: flex-end; justify-content: space-between; max-width: none; gap: 20px; }
 .section-title { font-size: clamp(2rem, 4vw, 3rem); margin-top: 16px; }
@@ -391,11 +411,12 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 .check { flex: none; width: 24px; height: 24px; border-radius: 999px; display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; color: var(--on-gold); background: var(--gold); }
 
 /* ---------- testimonials ---------- */
-.quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
-.quote { padding: 28px 26px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--inset-hi); }
+.quotes { display: grid; grid-template-columns: 1fr; gap: 18px; }
+.quote { padding: 32px 40px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--hair); box-shadow: var(--inset-hi); }
 .stars { color: var(--gold); letter-spacing: 2px; font-size: 0.95rem; }
 .quote blockquote { margin: 14px 0 18px; font-size: 1.02rem; line-height: 1.55; color: var(--ink-soft); }
 .quote figcaption { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 0.92rem; }
+.quote-src { font-weight: 400; color: var(--muted); }
 .av { width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; color: var(--on-gold); background: linear-gradient(150deg, var(--gold-bright), var(--gold-deep)); }
 
 /* ---------- final CTA ---------- */
@@ -562,7 +583,7 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
   .container { padding: 0 18px; }
   .nav-links, .nav-cta { display: none; }
   .hamburger { display: block; }
-  .section { padding: 70px 0; }
+  .section { padding: 90px 0; }
   .hero { padding: 130px 0 50px; }
   .section-head.row { flex-direction: column; align-items: flex-start; }
   .feature-grid { grid-template-columns: 1fr; }
@@ -613,7 +634,7 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 /* ícones na navbar com contador */
 .icon-btn { position: relative; width: 40px; height: 40px; border-radius: 999px; display: inline-grid; place-items: center; background: var(--surface); border: 1px solid var(--hair); color: var(--ink-soft); cursor: pointer; transition: color 0.25s var(--ease-out), border-color 0.25s var(--ease-out), background 0.25s var(--ease-out); }
 .icon-btn:hover { color: var(--gold); border-color: var(--gold); }
-.icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.icon-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .icon-btn.is-fav-page { color: var(--gold); border-color: var(--gold); }
 .icon-btn.is-fav-page svg { fill: var(--gold); stroke: var(--gold); }
 .icon-btn .count { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font-size: 10px; font-weight: 700; line-height: 1; display: none; align-items: center; justify-content: center; box-shadow: 0 0 0 2px var(--bg-2); }
@@ -695,7 +716,7 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 /* ============================================================
    BUSCA (navbar) + CATÁLOGO
    ============================================================ */
-.nav-search { flex: 1; max-width: 460px; display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); transition: border-color 0.2s, background 0.2s; }
+.nav-search { flex: 1; max-width: 640px; display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px; background: var(--surface); border: 1px solid var(--hair); transition: border-color 0.2s, background 0.2s; }
 .nav-search:focus-within { border-color: var(--gold); background: var(--bg-2); }
 .nav-search svg { width: 17px; height: 17px; fill: none; stroke: var(--muted); stroke-width: 2; flex: none; }
 .nav-search input { flex: 1; min-width: 0; border: none; background: none; color: var(--ink); font-family: inherit; font-size: 0.92rem; outline: none; }
@@ -1044,6 +1065,65 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
 
 /* --- evita scroll horizontal global em qualquer página --- */
 html { overflow-x: hidden; }
+
+/* ============================================================
+   SOBRE (about page)
+   ============================================================ */
+.about-hero-section { padding-bottom: 60px; }
+.about-hero { max-width: 46em; }
+.about-hero-title {
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  line-height: 1.12;
+  margin-top: 20px;
+  color: var(--ink);
+}
+.about-hero-title .grad {
+  background: linear-gradient(105deg, var(--gold-bright), var(--gold) 45%, var(--gold-deep));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.about-hero-lead { font-size: clamp(1.05rem, 1.4vw, 1.2rem); color: var(--ink-soft); max-width: 34em; margin-top: 22px; }
+.about-stats { margin-top: 48px; }
+
+.manifesto {
+  max-width: 34em; margin: 0 auto; text-align: center;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 600; line-height: 1.35;
+  color: var(--ink);
+}
+@media (max-width: 700px) { .br-desktop { display: none; } }
+
+.timeline { display: grid; gap: 0; max-width: 46em; }
+.timeline-item {
+  display: grid; grid-template-columns: 100px 1fr; gap: 28px;
+  padding: 26px 0; border-top: 1px solid var(--hair);
+}
+.timeline-item:last-child { border-bottom: 1px solid var(--hair); }
+.timeline-year {
+  font-family: "Bricolage Grotesque", sans-serif; font-weight: 700;
+  font-size: 1.3rem; color: var(--gold-deep);
+}
+.timeline-body h3 { font-size: 1.1rem; margin-bottom: 8px; }
+.timeline-body p { color: var(--ink-soft); font-size: 0.96rem; line-height: 1.55; max-width: 38em; }
+@media (max-width: 560px) {
+  .timeline-item { grid-template-columns: 1fr; gap: 8px; }
+}
+
+.team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.team-card {
+  padding: 30px 22px; border-radius: var(--r-md); background: var(--surface);
+  border: 1px solid var(--hair); text-align: center;
+}
+.team-avatar {
+  display: inline-grid; place-items: center; width: 56px; height: 56px;
+  border-radius: 999px; margin-bottom: 16px;
+  background: linear-gradient(150deg, var(--gold-bright), var(--gold-deep));
+  color: var(--on-gold); font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 700; font-size: 1.15rem;
+}
+.team-name { font-size: 1.02rem; margin-bottom: 4px; }
+.team-role { display: block; color: var(--muted); font-size: 0.85rem; }
+@media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .team-grid { grid-template-columns: 1fr; } }
 
 /* --- catalogo: chips de filtro sem overflow --- */
 @media (max-width: 560px) {

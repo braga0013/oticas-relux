@@ -92,7 +92,7 @@
           <span class="count" id="favCount">0</span>
         </button>
         <button class="icon-btn" id="cartBtn" type="button" aria-label="Sacola">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 8h11l-1 11.5a1.5 1.5 0 0 1-1.5 1.4H9a1.5 1.5 0 0 1-1.5-1.4L6.5 8Z"/><path d="M9.2 8a2.8 2.8 0 0 1 5.6 0"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="21" r="1" fill="currentColor" stroke="none"/><circle cx="20" cy="21" r="1" fill="currentColor" stroke="none"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           <span class="count" id="cartCount">0</span>
         </button>
         <!-- discreet theme toggle -->
@@ -149,31 +149,36 @@
   <main id="topo">
     <!-- ░░░ HERO ░░░ -->
     <section class="hero">
+      <div class="hero-video-bg" aria-hidden="true">
+        <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/vids/hero-fachada-poster.jpg">
+          <source src="assets/vids/hero-fachada.mp4" type="video/mp4" media="(min-width: 701px) and (prefers-reduced-motion: no-preference)" />
+        </video>
+        <div class="hero-video-scrim"></div>
+      </div>
       <div class="hero-glow" aria-hidden="true"></div>
       <div class="container hero-grid">
         <div class="hero-copy reveal">
           <span class="eyebrow"><i></i> Curadoria premium em óptica</span>
-          <h1 class="hero-title">
-            Visão de luxo.<br />
-            <span class="grad">Olhar único.</span>
+          <h1 class="hero-title hero-title--plain">
+            Encontre seu óculos<br />
+            com quem entende<br />
+            de verdade.
           </h1>
           <p class="hero-lead">
-            Óculos de sol e de grau selecionados peça a peça, lentes de alta tecnologia
-            e atendimento que enxerga você por inteiro. Exame de vista <b>gratuito</b>
-            e prova virtual sem sair de casa.
+            Óculos selecionados peça a peça, com lentes de alta tecnologia
+            e atendimento premium do início ao fim.
           </p>
           <div class="hero-cta">
-            <a class="btn btn-primary btn-lg" href="#colecoes">
+            <a class="btn btn-primary btn-lg hero-cta-main" href="#colecoes">
               <span>Ver coleção</span>
               <span class="btn-orb" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </span>
             </a>
-            <a class="btn btn-ghost btn-lg" href="#servicos">Exame de vista grátis</a>
           </div>
 
           <div class="hero-stats">
-            <div><span class="stat-n">12k+</span><span class="stat-l">clientes atendidos</span></div>
+            <div><span class="stat-n">7k+</span><span class="stat-l">clientes atendidos</span></div>
             <div class="div"></div>
             <div><span class="stat-n">+40</span><span class="stat-l">marcas premium</span></div>
             <div class="div"></div>
@@ -425,18 +430,18 @@
         <div class="quotes">
           <figure class="quote reveal">
             <div class="stars">★★★★★</div>
-            <blockquote>"Atendimento impecável. Me ajudaram a escolher uma armação que combinou perfeitamente com meu rosto. Saí enxergando — e me sentindo — melhor."</blockquote>
-            <figcaption><span class="av">M</span> Mariana S.</figcaption>
+            <blockquote>"A melhor ótica de Porto Alegre. Diria que o diferencial é o atendimento especializado. Tomei tufo em quase todas óticas da região, mas a Relux salvou minha visão. Sentia muitas dores na visão e depois que virei cliente da Relux, mudou tudo pra melhor. Agradeço muito."</blockquote>
+            <figcaption><span class="av">A</span> Aluízio Brasil <span class="quote-src">· Google</span></figcaption>
           </figure>
           <figure class="quote reveal" data-delay="80">
             <div class="stars">★★★★★</div>
-            <blockquote>"Fiz o exame de vista de graça e meu óculos ficou pronto em dois dias. Qualidade das lentes excelente, recomendo demais."</blockquote>
-            <figcaption><span class="av">R</span> Rafael T.</figcaption>
+            <blockquote>"Excelente atendimento! Desde quando entrei na loja até a entrega do óculos. Tudo perfeito. Gratidão a toda equipe Relux. Recomendo muito!"</blockquote>
+            <figcaption><span class="av">O</span> Oddone Segundo <span class="quote-src">· Google</span></figcaption>
           </figure>
           <figure class="quote reveal" data-delay="160">
             <div class="stars">★★★★★</div>
-            <blockquote>"Variedade de marcas linda e preços justos no parcelamento. A prova virtual facilitou muito a minha escolha."</blockquote>
-            <figcaption><span class="av">C</span> Camila R.</figcaption>
+            <blockquote>"Excelência em atendimento, cumprem o prazo, preços ótimos! Nada de negativo, experiência ótima com esta ótica."</blockquote>
+            <figcaption><span class="av">P</span> Pamela Rickes <span class="quote-src">· Google</span></figcaption>
           </figure>
         </div>
       </div>
@@ -503,7 +508,7 @@
 
       <nav class="footer-col" aria-label="Institucional">
         <h4>A Relux</h4>
-        <a href="#sobre">Sobre nós</a>
+        <a href="/sobre">Sobre nós</a>
         <a href="#contato">Contato</a>
         <a href="#">Políticas de privacidade</a>
         <a href="#">Trocas e devoluções</a>
