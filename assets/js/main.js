@@ -10,12 +10,12 @@
     var tog = document.getElementById("themeToggle");
     if (tog) tog.setAttribute("aria-pressed", String(t === "light"));
   }
-  // Light is the default (set in <html data-theme="light">). Only a saved
+  // Dark is the default (set in <html data-theme="dark">). Only a saved
   // choice overrides it, so the visitor's last preference is respected.
   try {
     var saved = localStorage.getItem(STORE);
     if (saved === "dark" || saved === "light") applyTheme(saved);
-  } catch (e) { /* storage blocked — keep default light */ }
+  } catch (e) { /* storage blocked — keep default dark */ }
 
   function bindThemeBtn(id) {
     var btn = document.getElementById(id);
