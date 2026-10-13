@@ -8,4 +8,4 @@ Disallow: /conta
 Disallow: /pedido
 Disallow: /api/
 
-Sitemap: https://oticasrelux.com.br/sitemap.xml
+Sitemap: https://www.oticasrelux.com.br/sitemap.xml
