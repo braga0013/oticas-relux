@@ -1,2 +1,13 @@
 assets/vids/*.mov
 assets/vids/*.MOV
+
+# artefatos de build do Remotion (~17MB) — não são servidos pelo site
+motion/
+
+# scripts de QA/Playwright usados só localmente
+review_*.js
+.claude/
+
+# originais das fotos de categoria (~2MB) — só o /produtos/*.png é servido
+assets/img/produtos/originais/
+assets/img/produtos/_remove_bg.py

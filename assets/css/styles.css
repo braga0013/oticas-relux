@@ -465,6 +465,13 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
   transition: transform 0.6s var(--ease-out);
   filter: drop-shadow(0 18px 22px rgba(0, 0, 0, 0.16));
 }
+/* Foto de estúdio em retrato (900x1200) num card em paisagem: com "contain" o
+   óculos saía a ~10% da área do card (parecia miniatura). Aqui a foto preenche
+   a moldura e o recorte come só o fundo vazio — o óculos fica em y 40-70% da
+   foto e a janela visível é y 22-78%, então nunca encosta. A classe é aplicada
+   no onload em products.js só quando a imagem é mais alta que larga; foto já
+   em paisagem continua com "contain" e aparece inteira. */
+.frame-photo.is-tall { object-fit: cover; padding: 0; filter: none; }
 .product:hover .frame-photo { transform: scale(1.06) rotate(-1deg); }
 .pdp-media .frame-photo { padding: 11%; }
 /* quando há foto, esconde o desenho (SVG) de fallback que fica atrás */

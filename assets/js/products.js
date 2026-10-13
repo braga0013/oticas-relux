@@ -105,11 +105,19 @@ window.RELUX.findProduct = function (id) {
   return (window.RELUX_PRODUCTS || []).filter(function (p) { return p.id === id; })[0] || null;
 };
 
+/* Foto em retrato dentro de moldura em paisagem fica minúscula com "contain".
+   Marca a imagem p/ o CSS preencher a moldura (ver .frame-photo.is-tall). */
+window.RELUX.fitPhoto = function (img) {
+  /* toggle, não add: a galeria da PDP troca o src e pode misturar orientações */
+  img.classList.toggle("is-tall", img.naturalHeight > img.naturalWidth);
+};
+
 /* monta a "moldura" da mídia: foto (se houver) + SVG de fallback */
 window.RELUX.mediaInner = function (p, extra) {
   var img = p.img
     ? '<img class="frame-photo" src="' + p.img + '" alt="' + p.name +
-      '" loading="lazy" onerror="this.closest(\'[data-tone]\').classList.remove(\'has-photo\'); this.remove();">'
+      '" loading="lazy" onload="RELUX.fitPhoto(this)"' +
+      ' onerror="this.closest(\'[data-tone]\').classList.remove(\'has-photo\'); this.remove();">'
     : "";
   return (extra || "") + img + '<svg viewBox="0 0 200 80" aria-hidden="true"><use href="#' + p.shape + '"/></svg>';
 };

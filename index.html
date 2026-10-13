@@ -3,13 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Óticas Relux — Visão de Luxo. Olhar Único.</title>
-  <meta name="description" content="Óticas Relux — óculos de sol, óculos de grau e lentes de contato com curadoria premium, exame de vista gratuito e prova virtual. Agende seu atendimento." />
+  <title>Encontre seus óculos com quem entende de verdade | Óticas Relux</title>
+  <meta name="description" content="Óculos selecionados peça a peça, com lentes de alta tecnologia e atendimento premium do início ao fim. Exame de vista gratuito em Porto Alegre." />
+  <link rel="canonical" href="https://oticasrelux.com.br/" />
+  <meta name="theme-color" content="#0a0a0a" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Óticas Relux — Visão de Luxo. Olhar Único." />
-  <meta property="og:description" content="Óculos de sol e de grau com curadoria premium, exame de vista gratuito e prova virtual." />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="Encontre seus óculos com quem entende de verdade | Óticas Relux" />
+  <meta property="og:description" content="Óculos selecionados peça a peça, com lentes de alta tecnologia e atendimento premium do início ao fim. Exame de vista gratuito em Porto Alegre." />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://oticasrelux.com.br/" />
+  <meta property="og:site_name" content="Óticas Relux" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta property="og:image" content="https://oticasrelux.com.br/assets/vids/hero-fachada-poster.jpg" />
+  <meta property="og:image:width" content="1280" />
+  <meta property="og:image:height" content="720" />
+  <meta property="og:image:alt" content="Fachada da Óticas Relux em Porto Alegre" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="google-site-verification" content="GIuQfgOjhDzHrSV69EzGSHMqYkm4pNobaN9mdOR_h78" />
 
   <!-- Fonts (premium grotesk + display) -->
@@ -18,7 +28,33 @@
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="assets/css/styles.css" />
-  <link rel="icon" href="assets/img/logo-relux.png" type="image/png" />
+  <link rel="icon" href="assets/img/logo-relux-icon.png" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/img/logo-relux-icon.png" />
+
+  <!-- Dados estruturados: ótica local (Google Business / rich results) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Optician",
+    "name": "Óticas Relux",
+    "url": "https://oticasrelux.com.br/",
+    "image": "https://oticasrelux.com.br/assets/vids/hero-fachada-poster.jpg",
+    "logo": "https://oticasrelux.com.br/assets/img/logo-relux.png",
+    "telephone": "+5551995963008",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Av. Assis Brasil, 2874",
+      "addressLocality": "Porto Alegre",
+      "addressRegion": "RS",
+      "addressCountry": "BR"
+    },
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "09:00", "closes": "18:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "09:00", "closes": "13:00" }
+    ]
+  }
+  </script>
 </head>
 <body>
   <!-- film-grain overlay -->
@@ -74,7 +110,7 @@
   <header class="nav-wrap" id="navWrap">
     <nav class="nav" aria-label="Navegação principal">
       <a href="#topo" class="nav-brand" aria-label="Óticas Relux — início">
-        <img src="assets/img/logo-relux.png" alt="Óticas Relux" class="brand-logo" />
+        <img src="assets/img/logo-relux.png" width="800" height="708" alt="Óticas Relux" class="brand-logo" />
       </a>
 
       <form class="nav-search js-search-form" role="search">
@@ -160,7 +196,7 @@
         <div class="hero-copy reveal">
           <span class="eyebrow"><i></i> Curadoria premium em óptica</span>
           <h1 class="hero-title hero-title--plain">
-            Encontre seu óculos<br />
+            Encontre seus óculos<br />
             com quem entende<br />
             de verdade.
           </h1>
@@ -187,7 +223,7 @@
         </div>
 
         <div class="hero-visual hero-visual--plain reveal" data-delay="120">
-          <img src="assets/img/logo-relux.png" alt="Óticas Relux" class="hero-eye hero-logo" />
+          <img src="assets/img/logo-relux.png" width="800" height="708" alt="Óticas Relux" class="hero-eye hero-logo" />
         </div>
       </div>
     </section>
@@ -381,7 +417,7 @@
         <div class="about-visual reveal">
           <div class="visual-shell tall">
             <div class="visual-core center">
-              <img src="assets/img/logo-relux.png" alt="" aria-hidden="true" class="hero-eye lg hero-logo" />
+              <img src="assets/img/logo-relux.png" width="800" height="708" alt="" aria-hidden="true" class="hero-eye lg hero-logo" />
             </div>
           </div>
         </div>
@@ -467,7 +503,7 @@
     <div class="container footer-grid">
       <div class="footer-brand">
         <a href="#topo" class="nav-brand" aria-label="Óticas Relux">
-          <img src="assets/img/logo-relux.png" alt="Óticas Relux" class="brand-logo brand-logo-footer" />
+          <img src="assets/img/logo-relux.png" width="800" height="708" alt="Óticas Relux" class="brand-logo brand-logo-footer" />
         </a>
         <p>Visão de luxo, olhar único. Óptica premium com atendimento que enxerga você por inteiro.</p>
         <div class="socials">

@@ -6,18 +6,13 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://oticasrelux.com.br/catalogo.html</loc>
+    <loc>https://oticasrelux.com.br/catalogo</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://oticasrelux.com.br/conta.html</loc>
+    <loc>https://oticasrelux.com.br/sobre</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://oticasrelux.com.br/checkout.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.4</priority>
+    <priority>0.7</priority>
   </url>
 </urlset>

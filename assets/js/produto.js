@@ -42,6 +42,7 @@
     img.src = p.img;
     img.alt = p.name;
     img.onerror = function () { media.classList.remove("has-photo"); this.remove(); };
+    img.onload = function () { window.RELUX.fitPhoto(this); };
     media.insertBefore(img, media.querySelector("svg"));
   }
 
@@ -168,7 +169,14 @@
   setMeta("product:availability", "in stock");
   setMeta("product:condition", "new");
   if (p.img) setMeta("og:image", window.location.origin + "/" + p.img);
+  setMeta("description", (p.desc || "").replace(/\s+/g, " ").trim().slice(0, 155), true);
   document.title = p.name + " — Óticas Relux";
+
+  /* canonical por produto (evita URLs duplicadas no Google) */
+  var canon = document.querySelector('link[rel="canonical"]');
+  if (!canon) { canon = document.createElement("link"); canon.rel = "canonical"; document.head.appendChild(canon); }
+  canon.href = window.location.origin + "/produto?id=" + encodeURIComponent(p.id);
+  setMeta("og:url", canon.href);
   }
 
   /* espera DOM + catálogo do Supabase antes de renderizar */

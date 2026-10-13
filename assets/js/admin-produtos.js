@@ -383,7 +383,11 @@
   }
   el("addSpecBtn").addEventListener("click", function () { addSpecRow("", ""); });
 
-  /* ── Upload helper (com compressão para respeitar limite 1MB do Vercel) ── */
+  /* ── Upload helper (com compressão para respeitar limite 1MB do Vercel) ──
+     Não recortamos a foto aqui: o enquadramento é resolvido no CSS
+     (.frame-photo.is-tall em styles.css), que preenche a moldura sem depender
+     de detectar o fundo — as fotos da loja têm fundo em degradê e qualquer
+     heurística de pixel erra nelas. */
   function compressImage(file, callback) {
     var img = new Image();
     var url = URL.createObjectURL(file);

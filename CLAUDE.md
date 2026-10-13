@@ -188,6 +188,15 @@ sort            INTEGER
 
 **Solução:** Verificado domínio `oticasrelux.com.br` no Resend + configurado `EMAIL_FROM=noreply@oticasrelux.com.br`.
 
+### BUG 6: Foto do produto aparecia como miniatura no card (resolvido 12/10/2026)
+**Causa raiz:** as fotos de estúdio são em **retrato** (900x1200), mas `.product-media` é em **paisagem** (4:3). Com `object-fit: contain` a foto era limitada pela altura e renderizava a ~38% da área do card — e o óculos em si ocupa só a faixa y 40-70% da foto, então o produto ficava com ~10% da área do card.
+
+**Solução:** `RELUX.fitPhoto()` (em `products.js`) adiciona a classe `is-tall` no `onload` quando `naturalHeight > naturalWidth`; o CSS `.frame-photo.is-tall` usa `object-fit: cover` + `padding: 0`, preenchendo a moldura. O recorte só come fundo vazio: janela visível é y 22-78% e o óculos fica em y 38-70% nas 11 fotos do catálogo (verificado).
+
+**Regra:** foto em paisagem continua com `contain` (as PNGs de lente Oftalsul são 120x48 — com `cover` seriam cortadas pelas laterais). Não troque o `object-fit` global e não mude `aspect-ratio` de `.product-media` para retrato: o *produto* é paisagem mesmo quando a *foto* é retrato.
+
+**Não** tentar recortar o fundo por detecção de pixel no upload — as fotos da loja têm fundo em **degradê** e a detecção por cor dos cantos erra nelas (testado).
+
 ### BUG 5: "Filtro Azul" duplicado no admin (resolvido)
 **Causa:** Label do tipo `sem-grau-filtro-azul` era "Filtro Azul" E o extra `filtro-azul-extra` também era "Filtro Azul".
 
