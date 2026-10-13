@@ -283,7 +283,10 @@ h1, h2, h3, h4 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 70
   display: grid; place-items: center;
 }
 .visual-core.center { aspect-ratio: 4 / 5; }
-.hero-eye { width: 64%; filter: drop-shadow(0 18px 40px rgba(0,0,0,0.4)); animation: floaty 7s var(--ease-inout) infinite; }
+/* height:auto é obrigatório: o <img> tem width/height intrínsecos no HTML (p/
+   reservar espaço e evitar CLS) e aqui só a largura é definida — sem isso o
+   atributo height do HTML vale como altura real e deforma o logo. */
+.hero-eye { width: 64%; height: auto; filter: drop-shadow(0 18px 40px rgba(0,0,0,0.4)); animation: floaty 7s var(--ease-inout) infinite; }
 .hero-eye.lg { width: 72%; }
 .hero-logo { }
 

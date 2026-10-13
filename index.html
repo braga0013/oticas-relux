@@ -187,7 +187,13 @@
     <section class="hero">
       <div class="hero-video-bg" aria-hidden="true">
         <video class="hero-video" autoplay muted loop playsinline preload="metadata" poster="assets/vids/hero-fachada-poster.jpg">
-          <source src="assets/vids/hero-fachada.mp4" type="video/mp4" media="(min-width: 701px) and (prefers-reduced-motion: no-preference)" />
+          <!-- Só o gate de largura: no mobile o poster evita baixar 8,9 MB.
+               O gate de "prefers-reduced-motion" foi removido porque o Windows
+               com "mostrar animações" desligado reporta reduce sem o usuário ter
+               pedido acessibilidade, e aí nenhuma <source> casava e o vídeo
+               ficava sem arquivo (networkState 3). O vídeo é ambiente: já tem
+               blur(6px) e scrim de 68%, sem flash nem parallax. -->
+          <source src="assets/vids/hero-fachada.mp4" type="video/mp4" media="(min-width: 701px)" />
         </video>
         <div class="hero-video-scrim"></div>
       </div>
