@@ -131,6 +131,14 @@
   if (window.RELUX && window.RELUX.refreshUI) window.RELUX.refreshUI();
 
   /* ── Schema.org (Google Shopping) ── */
+  /* p.img pode ser caminho relativo (lentes locais) OU URL completa do Supabase
+     Storage (fotos cadastradas no admin). Concatenar origin sempre gerava
+     ".../https://..." nas fotos do Storage e o Google descarta o produto, já que
+     "image" é obrigatório. */
+  function absUrl(src) {
+    if (!src) return "";
+    return /^https?:\/\//.test(src) ? src : window.location.origin + "/" + src.replace(/^\/+/, "");
+  }
   var priceNum = p.price.replace(/[^\d,]/g, "").replace(",", ".");
   var schemaData = {
     "@context": "https://schema.org",
@@ -148,7 +156,7 @@
       "itemCondition": "https://schema.org/NewCondition"
     }
   };
-  if (p.img) schemaData.image = window.location.origin + "/" + p.img;
+  if (p.img) schemaData.image = absUrl(p.img);
   var schemaScript = document.createElement("script");
   schemaScript.type = "application/ld+json";
   schemaScript.textContent = JSON.stringify(schemaData);
@@ -168,7 +176,7 @@
   setMeta("og:price:currency", "BRL");
   setMeta("product:availability", "in stock");
   setMeta("product:condition", "new");
-  if (p.img) setMeta("og:image", window.location.origin + "/" + p.img);
+  if (p.img) setMeta("og:image", absUrl(p.img));
   setMeta("description", (p.desc || "").replace(/\s+/g, " ").trim().slice(0, 155), true);
   document.title = p.name + " — Óticas Relux";
 
